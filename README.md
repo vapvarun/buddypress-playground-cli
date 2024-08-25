@@ -20,8 +20,11 @@ This plugin includes several modules, each designed to generate specific types o
     wp bp create_groups --count=200 --public=70 --private=25 --hidden=5
 
 `--count`: (Optional) Total number of groups to create. Defaults to 200.
+
 `--public`: (Optional) Percentage of groups to be public. Defaults to 70%.
+
 `--private`: (Optional) Percentage of groups to be private. Defaults to 25%.
+
 `--hidden`: (Optional) Percentage of groups to be hidden. Defaults to 5%.
 
 **Example:**
