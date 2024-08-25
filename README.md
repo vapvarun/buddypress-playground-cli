@@ -1,4 +1,3 @@
-
 # BuddyPress Playground CLI
 
 BuddyPress Playground CLI is a WordPress MU plugin that helps you generate test data for your BuddyPress installation. This plugin includes several modules that can create random activities, group activities, messages, connections, group members, and more. It is designed to help developers test the BuddyPress functionality thoroughly.
@@ -14,13 +13,22 @@ This plugin includes several modules, each designed to generate specific types o
 
 ### 1. BP_Groups_Module
 
-**Description:** Generates random BuddyPress groups with a specified number of groups and assigns random users as group admins.
+**Description:** Generates random BuddyPress groups with a specified number of groups and assigns random users as group admins. The groups can be public, private, or hidden based on the specified percentages.
 
 **Usage:**
 
-    wp bp create-groups --count=200
+    wp bp create_groups --count=200 --public=70 --private=25 --hidden=5
 
-- `--count`: (Optional) Number of groups to create. Defaults to 200.
+- `--count`: (Optional) Total number of groups to create. Defaults to 200.
+- `--public`: (Optional) Percentage of groups to be public. Defaults to 70%.
+- `--private`: (Optional) Percentage of groups to be private. Defaults to 25%.
+- `--hidden`: (Optional) Percentage of groups to be hidden. Defaults to 5%.
+
+**Example:**
+
+To create 200 groups with 70% public, 25% private, and 5% hidden:
+
+    wp bp create_groups --count=200 --public=70 --private=25 --hidden=5
 
 ### 2. BP_Activities_Module
 
@@ -28,7 +36,7 @@ This plugin includes several modules, each designed to generate specific types o
 
 **Usage:**
 
-    wp bp create-activities --count=50
+    wp bp create_activities --count=50
 
 - `--count`: (Optional) Number of activities to create. Defaults to 50.
 
@@ -38,7 +46,7 @@ This plugin includes several modules, each designed to generate specific types o
 
 **Usage:**
 
-    wp bp create-group-activities --min=5
+    wp bp create_group_activities --min=5
 
 - `--min`: (Optional) Minimum number of activities per group. Defaults to 5.
 
@@ -48,7 +56,7 @@ This plugin includes several modules, each designed to generate specific types o
 
 **Usage:**
 
-    wp bp create-messages --count=200
+    wp bp create_messages --count=200
 
 - `--count`: (Optional) Number of messages to create. Defaults to 200.
 
@@ -58,7 +66,7 @@ This plugin includes several modules, each designed to generate specific types o
 
 **Usage:**
 
-    wp bp create-connections --count=200
+    wp bp create_connections --count=200
 
 - `--count`: (Optional) Number of connections to create. Defaults to 200.
 
@@ -68,7 +76,7 @@ This plugin includes several modules, each designed to generate specific types o
 
 **Usage:**
 
-    wp bp create-activity-comments --count=100
+    wp bp create_activity_comments --count=100
 
 - `--count`: (Optional) Number of comments to create. Defaults to 100.
 
@@ -78,9 +86,25 @@ This plugin includes several modules, each designed to generate specific types o
 
 **Usage:**
 
-    wp bp add-group-members
+    wp bp add_group_members
 
 - No additional parameters are needed.
+
+### 8. BP_Update_Last_Activity_Module
+
+**Description:** Updates the last activity timestamp for all users in batches. This ensures that all users appear in the BuddyPress member directory based on their last activity. The process is done in batches to prevent server overload.
+
+**Usage:**
+
+    wp bp update_last_activity --batch_size=1000
+
+- `--batch_size`: (Optional) The number of users to process in each batch. Defaults to 1000.
+
+**Example:**
+
+To update the last activity timestamp for all users, processing them in batches of 1000:
+
+    wp bp update_last_activity --batch_size=1000
 
 ## Running Commands
 
