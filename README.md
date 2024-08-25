@@ -1,6 +1,6 @@
 # BuddyPress Playground CLI
 
-BuddyPress Playground CLI is a WordPress MU plugin that helps you generate test data for your BuddyPress installation. This plugin includes several modules that can create random activities, group activities, messages, connections, group members, and more. It is designed to help developers test the BuddyPress functionality thoroughly.
+BuddyPress Playground CLI is a WordPress plugin that helps you generate test data for your BuddyPress installation. This plugin includes several modules that can create random activities, group activities, messages, connections, group members, and more. It is designed to help developers test the BuddyPress functionality thoroughly.
 
 ## Installation
 
