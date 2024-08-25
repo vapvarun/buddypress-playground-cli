@@ -19,10 +19,10 @@ This plugin includes several modules, each designed to generate specific types o
 
     wp bp create_groups --count=200 --public=70 --private=25 --hidden=5
 
-- `--count`: (Optional) Total number of groups to create. Defaults to 200.
-- `--public`: (Optional) Percentage of groups to be public. Defaults to 70%.
-- `--private`: (Optional) Percentage of groups to be private. Defaults to 25%.
-- `--hidden`: (Optional) Percentage of groups to be hidden. Defaults to 5%.
+`--count`: (Optional) Total number of groups to create. Defaults to 200.
+`--public`: (Optional) Percentage of groups to be public. Defaults to 70%.
+`--private`: (Optional) Percentage of groups to be private. Defaults to 25%.
+`--hidden`: (Optional) Percentage of groups to be hidden. Defaults to 5%.
 
 **Example:**
 
@@ -38,7 +38,7 @@ To create 200 groups with 70% public, 25% private, and 5% hidden:
 
     wp bp create_activities --count=50
 
-- `--count`: (Optional) Number of activities to create. Defaults to 50.
+`--count`: (Optional) Number of activities to create. Defaults to 50.
 
 ### 3. BP_Group_Activities_Module
 
@@ -48,7 +48,7 @@ To create 200 groups with 70% public, 25% private, and 5% hidden:
 
     wp bp create_group_activities --min=5
 
-- `--min`: (Optional) Minimum number of activities per group. Defaults to 5.
+`--min`: (Optional) Minimum number of activities per group. Defaults to 5.
 
 ### 4. BP_Messages_Module
 
@@ -58,7 +58,7 @@ To create 200 groups with 70% public, 25% private, and 5% hidden:
 
     wp bp create_messages --count=200
 
-- `--count`: (Optional) Number of messages to create. Defaults to 200.
+`--count`: (Optional) Number of messages to create. Defaults to 200.
 
 ### 5. BP_Connections_Module
 
@@ -68,7 +68,7 @@ To create 200 groups with 70% public, 25% private, and 5% hidden:
 
     wp bp create_connections --count=200
 
-- `--count`: (Optional) Number of connections to create. Defaults to 200.
+`--count`: (Optional) Number of connections to create. Defaults to 200.
 
 ### 6. BP_Activity_Comments_Module
 
@@ -78,7 +78,7 @@ To create 200 groups with 70% public, 25% private, and 5% hidden:
 
     wp bp create_activity_comments --count=100
 
-- `--count`: (Optional) Number of comments to create. Defaults to 100.
+`--count`: (Optional) Number of comments to create. Defaults to 100.
 
 ### 7. BP_Group_Members_Module
 
@@ -98,7 +98,7 @@ To create 200 groups with 70% public, 25% private, and 5% hidden:
 
     wp bp update_last_activity --batch_size=1000
 
-- `--batch_size`: (Optional) The number of users to process in each batch. Defaults to 1000.
+`--batch_size`: (Optional) The number of users to process in each batch. Defaults to 1000.
 
 **Example:**
 
