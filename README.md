@@ -109,9 +109,27 @@ To update the last activity timestamp for all users, processing them in batches 
 
     wp bp update_last_activity --batch_size=1000
 
+### 9. BP_Create_Users_Module
+
+**Description:** Generates a specified number of users with random first names, last names, and unique usernames. Each user also has a randomly assigned 2-liner bio.
+
+**Usage:**
+
+    wp bp create_users --count=500
+
+- `--count`: (Optional) The number of users to create. Defaults to 500.
+
+**Example:**
+
+To create 500 users with random names, usernames, and bios:
+
+    wp bp create_users --count=500
+
+This command will create a set of users with diverse profiles, useful for populating a BuddyPress site for testing or demo purposes.
+
 ## Running Commands
 
-To use the above commands, ensure that you have WP-CLI installed and running on your WordPress installation. Execute the commands from your terminal in the root directory of your WordPress site.
+To use the above commands, please ensure you have WP-CLI installed and running on your WordPress installation. Please go ahead and execute the commands from your terminal in the root directory of your WordPress site.
 
 ## Contributing
 
