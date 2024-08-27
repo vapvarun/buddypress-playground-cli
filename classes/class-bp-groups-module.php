@@ -20,7 +20,7 @@ class BP_Groups_Module {
         }
 
         // Helper function to create a group
-        function create_group( $group_name, $group_slug, $group_status, $owner_user, $group_id ) {
+        function create_group( $group_name, $group_slug, $group_status, $owner_user ) {
             $group_id = groups_create_group( array(
                 'creator_id'  => $owner_user->ID,
                 'name'        => $group_name,
@@ -43,7 +43,7 @@ class BP_Groups_Module {
             $group_slug = 'public-group-' . $i;
             $owner_user = $users[ array_rand( $users ) ];
 
-            create_group( $group_name, $group_slug, 'public', $owner_user, $group_id );
+            create_group( $group_name, $group_slug, 'public', $owner_user );
         }
 
         // Loop to create private groups
@@ -52,7 +52,7 @@ class BP_Groups_Module {
             $group_slug = 'private-group-' . $i;
             $owner_user = $users[ array_rand( $users ) ];
 
-            create_group( $group_name, $group_slug, 'private', $owner_user, $group_id );
+            create_group( $group_name, $group_slug, 'private', $owner_user );
         }
 
         // Loop to create hidden groups
@@ -61,7 +61,7 @@ class BP_Groups_Module {
             $group_slug = 'hidden-group-' . $i;
             $owner_user = $users[ array_rand( $users ) ];
 
-            create_group( $group_name, $group_slug, 'hidden', $owner_user, $group_id );
+            create_group( $group_name, $group_slug, 'hidden', $owner_user );
         }
     }
 }
