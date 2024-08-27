@@ -26,6 +26,7 @@ require_once BP_PLAYGROUND_CLI_PATH . 'classes/class-bp-activity-comments-module
 require_once BP_PLAYGROUND_CLI_PATH . 'classes/class-bp-group-activities-module.php';
 require_once BP_PLAYGROUND_CLI_PATH . 'classes/class-bp-group-members-module.php';
 require_once BP_PLAYGROUND_CLI_PATH . 'classes/class-bp-update-last-activity-module.php';
+require_once BP_PLAYGROUND_CLI_PATH . 'classes/class-bp-create-users-module.php';
 
 
 // Include the WP-CLI command class
