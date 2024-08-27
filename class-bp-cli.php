@@ -54,6 +54,13 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
             $activity_module->update_all_users_last_activity_in_batches( $batch_size );
             WP_CLI::success( "User last activity timestamps have been updated." );
         }
+
+        public function create_users( $args, $assoc_args ) {
+            $count = isset( $assoc_args['count'] ) ? (int) $assoc_args['count'] : 500;
+            $user_module = new BP_Create_Users_Module();
+            $user_module->create_users( $count );
+            WP_CLI::success( "$count users have been created." );
+        }
     }
 
     WP_CLI::add_command( 'bp', 'BP_CLI' );
