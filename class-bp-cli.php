@@ -61,6 +61,13 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
             $user_module->create_users( $count );
             WP_CLI::success( "$count users have been created." );
         }
+
+        public function create_group_activities( $args, $assoc_args ) {
+            $min_activities = isset( $assoc_args['min_activities'] ) ? (int) $assoc_args['min_activities'] : 5;
+            $group_activities_module = new BP_Group_Activities_Module();
+            $group_activities_module->create_group_activities_by_admins( $min_activities );
+            WP_CLI::success( "Created $min_activities activities for each group admin." );
+        }
     }
 
     WP_CLI::add_command( 'bp', 'BP_CLI' );
