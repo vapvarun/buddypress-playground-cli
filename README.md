@@ -127,6 +127,24 @@ To create 500 users with random names, usernames, and bios:
 
 This command will create a set of users with diverse profiles, useful for populating a BuddyPress site for testing or demo purposes.
 
+### 10. BP_BBPress_Module
+
+**Description:** Creates bbPress forum topics and replies using random historical and war facts. Topics are created with historical facts as the title, and replies are created using war facts.
+
+**Usage:**
+
+    wp bp create_forums_with_topics_replies --forum_count=10 --min_topics=10 --max_topics=15 --min_replies=3 --max_replies=7
+
+`--forum_count`: (Optional) Number of forums to create. Defaults to 10.
+
+`--min_topics`: (Optional) Minimum number of topics to create per forum. Defaults to 10.
+
+`--max_topics`: (Optional) Maximum number of topics to create per forum. Defaults to 15.
+
+`--min_replies`: (Optional) Minimum number of replies per topic. Defaults to 3.
+
+`--max_replies`: (Optional) Maximum number of replies per topic. Defaults to 7.
+
 ## Running Commands
 
 To use the above commands, please ensure you have WP-CLI installed and running on your WordPress installation. Please go ahead and execute the commands from your terminal in the root directory of your WordPress site.

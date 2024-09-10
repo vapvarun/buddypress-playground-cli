@@ -68,6 +68,19 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
             $group_activities_module->create_group_activities_by_admins( $min_activities );
             WP_CLI::success( "Created $min_activities activities for each group admin." );
         }
+        
+        public function create_forums_with_topics_replies( $args, $assoc_args ) {
+            $forum_count  = isset( $assoc_args['forum_count'] ) ? (int) $assoc_args['forum_count'] : 10;
+            $min_topics   = isset( $assoc_args['min_topics'] ) ? (int) $assoc_args['min_topics'] : 10;
+            $max_topics   = isset( $assoc_args['max_topics'] ) ? (int) $assoc_args['max_topics'] : 15;
+            $min_replies  = isset( $assoc_args['min_replies'] ) ? (int) $assoc_args['min_replies'] : 3;
+            $max_replies  = isset( $assoc_args['max_replies'] ) ? (int) $assoc_args['max_replies'] : 7;
+        
+            $bbpress_module = new BP_BBPress_Module();
+            $bbpress_module->create_forums_with_topics_and_replies( $forum_count, $min_topics, $max_topics, $min_replies, $max_replies );
+            WP_CLI::success( "Created forums with historical facts as topics and war facts as replies." );
+        }
+        
     }
 
     WP_CLI::add_command( 'bp', 'BP_CLI' );
