@@ -7,6 +7,8 @@ class BP_Groups_Module {
             return;
         }
 
+        global $wpdb;
+
         // Calculate the number of groups for each type based on the percentages
         $public_count = round( $total_count * ($public_percentage / 100) );
         $private_count = round( $total_count * ($private_percentage / 100) );
@@ -21,6 +23,9 @@ class BP_Groups_Module {
 
         // Helper function to create a group
         function create_group( $group_name, $group_slug, $group_status, $owner_user ) {
+            global $wpdb;
+
+            // Create group using BuddyPress function
             $group_id = groups_create_group( array(
                 'creator_id'  => $owner_user->ID,
                 'name'        => $group_name,
@@ -30,8 +35,20 @@ class BP_Groups_Module {
             ) );
 
             if ( $group_id ) {
-                groups_accept_invite( $owner_user->ID, $group_id ); // Add the user to the group
-                groups_promote_member( $owner_user->ID, $group_id, 'admin' ); // Promote the user to admin
+                // Add the user to the group and promote to admin
+                groups_accept_invite( $owner_user->ID, $group_id );
+                groups_promote_member( $owner_user->ID, $group_id, 'admin' );
+
+                // Insert the 'invite_status' meta key with value 'members'
+                $wpdb->insert(
+                    $wpdb->prefix . 'bp_groups_groupmeta',
+                    array(
+                        'group_id'   => $group_id,
+                        'meta_key'   => 'invite_status',
+                        'meta_value' => 'members',
+                    ),
+                    array( '%d', '%s', '%s' )
+                );
             }
 
             return $group_id;
