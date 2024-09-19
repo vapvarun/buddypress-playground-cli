@@ -1,8 +1,20 @@
 <?php
 
 class BP_Create_Users_Module {
+    
 
     public function create_users( $count = 500 ) {
+        
+        // Ensure BuddyPress is loaded and initialized correctly
+        if ( ! function_exists( 'buddypress' ) ) {
+            require_once WP_PLUGIN_DIR . '/buddypress/bp-loader.php';
+        }
+
+        // Ensure the xProfile component is active and loaded
+        if ( ! bp_is_active( 'xprofile' ) ) {
+            bp_core_load_component( 'xprofile' );
+        }
+    
         $first_names = array('Liam', 'Noah', 'Oliver', 'Elijah', 'William', 'James', 'Benjamin', 'Lucas', 'Henry', 'Alexander', 'Mason', 'Michael', 'Ethan', 'Daniel', 'Jacob', 'Logan', 'Jackson', 'Levi', 'Sebastian', 'Mateo', 'Jack', 'Owen', 'Theodore', 'Aiden', 'Samuel', 'Joseph', 'John', 'David', 'Wyatt', 'Matthew', 'Luke', 'Asher', 'Carter', 'Julian', 'Grayson', 'Leo', 'Jayden', 'Gabriel', 'Isaac', 'Lincoln', 'Anthony', 'Hudson', 'Dylan', 'Ezra', 'Thomas', 'Charles', 'Christopher', 'Jaxon', 'Maverick', 'Josiah', 'Isaiah', 'Andrew', 'Elias', 'Joshua', 'Nathan', 'Caleb', 'Ryan', 'Adrian', 'Miles', 'Eli', 'Nolan', 'Christian', 'Aaron', 'Cameron', 'Ezekiel', 'Colton', 'Luca', 'Landon', 'Hunter', 'Jonathan', 'Santiago', 'Axel', 'Easton', 'Cooper', 'Jeremiah', 'Angel', 'Roman', 'Connor', 'Jameson', 'Robert', 'Greyson', 'Jordan', 'Ian', 'Carson', 'Jace', 'Leonardo', 'Nicholas', 'Dominic', 'Austin', 'Everett', 'Brooks', 'Xavier', 'Kai', 'Jose', 'Parker', 'Adam', 'Jaxson', 'Wesley', 'Kayden', 'Silas', 'Bennett', 'Declan', 'Weston');
         $last_names = array('Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson', 'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin', 'Lee', 'Perez', 'Thompson', 'White', 'Harris', 'Sanchez', 'Clark', 'Ramirez', 'Lewis', 'Robinson', 'Walker', 'Young', 'Allen', 'King', 'Wright', 'Scott', 'Torres', 'Nguyen', 'Hill', 'Flores', 'Green', 'Adams', 'Nelson', 'Baker', 'Hall', 'Rivera', 'Campbell', 'Mitchell', 'Carter', 'Roberts', 'Gomez', 'Phillips', 'Evans', 'Turner', 'Diaz', 'Parker', 'Cruz', 'Edwards', 'Collins', 'Reyes', 'Stewart', 'Morris', 'Morales', 'Murphy', 'Cook', 'Rogers', 'Gutierrez', 'Ortiz', 'Morgan', 'Cooper', 'Peterson', 'Bailey', 'Reed', 'Kelly', 'Howard', 'Ramos', 'Kim', 'Cox', 'Ward', 'Richardson', 'Watson', 'Brooks', 'Chavez', 'Wood', 'James', 'Bennett', 'Gray', 'Mendoza', 'Ruiz', 'Hughes', 'Price', 'Alvarez', 'Castillo', 'Sanders', 'Patel', 'Myers', 'Long', 'Ross', 'Foster', 'Jimenez', 'Powell');
         $bios = array(
@@ -145,29 +157,63 @@ class BP_Create_Users_Module {
             if ( ! is_wp_error( $user_id ) ) {
                 // Optionally, update the last activity to ensure the user shows up in directories
                 bp_update_user_last_activity( $user_id );
-            
-                // Extra code to fetch xProfile fields and assign random values
-                // Fetch all xProfile fields of types checkbox, radio, and multiselect
-                $xprofile_fields = xprofile_get_fields( array( 'type' => array( 'checkbox', 'radio', 'multiselect' ) ) );
-            
-                // Loop through each xProfile field and set random values
-                foreach ( $xprofile_fields as $field ) {
-                    $field_options = BP_XProfile_Field::get_field_options( $field->id );
-            
-                    if ( ! empty( $field_options ) ) {
-                        if ( $field->type == 'checkbox' || $field->type == 'multiselect' ) {
-                            // Randomly select multiple values for checkbox/multiselect fields
-                            $random_options = array_rand( array_flip( wp_list_pluck( $field_options, 'name' ) ), 2 ); // Choose 2 options
-                        } elseif ( $field->type == 'radio' ) {
-                            // Randomly select one value for radio fields
-                            $random_options = $field_options[ array_rand( $field_options ) ]->name;
+
+                // Fetch all xProfile groups with fields
+                $profile_groups = BP_XProfile_Group::get( array(
+                    'fetch_fields' => true // Ensure we fetch the fields as well
+                ) );
+
+                // Loop through each profile group and its fields
+                foreach ( $profile_groups as $group ) {
+                    foreach ( $group->fields as $field ) {
+                        $field_type = $field->type;
+                        $field_id   = $field->id;
+
+                        // Get the options for fields that are checkbox, radio, multiselect, etc.
+                        $options = $field->get_children( true );
+
+                        $random_options = '';
+
+                        // Handle predefined field types
+                        switch ( $field_type ) {
+                            case 'checkbox':
+                            case 'multiselectbox':
+                                // Randomly select multiple values for checkbox/multiselect fields
+                                if ( ! empty( $options ) ) {
+                                    $random_options = array_rand( array_flip( wp_list_pluck( $options, 'name' ) ), 2 ); // Choose 2 options
+                                }
+                                break;
+
+                            case 'radio':
+                            case 'selectbox':
+                                // Randomly select one value for radio/select fields
+                                if ( ! empty( $options ) ) {
+                                    $random_options = $options[ array_rand( $options ) ]->name;
+                                }
+                                break;
+
+                            case 'gender':
+                                // Set gender field with predefined values (Male, Female, Other)
+                                $genders = array( 'Male', 'Female', 'Other' );
+                                $random_options = $genders[ array_rand( $genders ) ];
+                                break;
+
+                            case 'member-types':
+                                // Get all active member types and randomly assign one
+                                $member_types = bp_get_member_types();
+                                if ( ! empty( $member_types ) ) {
+                                    $random_options = $member_types[ array_rand( $member_types ) ];
+                                }
+                                break;
                         }
-            
-                        // Update the user's xProfile data for the field
-                        xprofile_set_field_data( $field->id, $user_id, $random_options );
+
+                        // Update the user's xProfile data for the field if random_options is set
+                        if ( ! empty( $random_options ) ) {
+                            xprofile_set_field_data( $field_id, $user_id, $random_options );
+                        }
                     }
                 }
-            }
+            }          
 
         }
 
