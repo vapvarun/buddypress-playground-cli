@@ -143,9 +143,32 @@ class BP_Create_Users_Module {
             ));
 
             if ( ! is_wp_error( $user_id ) ) {
-                // Optionally, you can update the last activity to make sure the user shows up in directories
+                // Optionally, update the last activity to ensure the user shows up in directories
                 bp_update_user_last_activity( $user_id );
+            
+                // Extra code to fetch xProfile fields and assign random values
+                // Fetch all xProfile fields of types checkbox, radio, and multiselect
+                $xprofile_fields = xprofile_get_fields( array( 'type' => array( 'checkbox', 'radio', 'multiselect' ) ) );
+            
+                // Loop through each xProfile field and set random values
+                foreach ( $xprofile_fields as $field ) {
+                    $field_options = BP_XProfile_Field::get_field_options( $field->id );
+            
+                    if ( ! empty( $field_options ) ) {
+                        if ( $field->type == 'checkbox' || $field->type == 'multiselect' ) {
+                            // Randomly select multiple values for checkbox/multiselect fields
+                            $random_options = array_rand( array_flip( wp_list_pluck( $field_options, 'name' ) ), 2 ); // Choose 2 options
+                        } elseif ( $field->type == 'radio' ) {
+                            // Randomly select one value for radio fields
+                            $random_options = $field_options[ array_rand( $field_options ) ]->name;
+                        }
+            
+                        // Update the user's xProfile data for the field
+                        xprofile_set_field_data( $field->id, $user_id, $random_options );
+                    }
+                }
             }
+
         }
 
         echo "$count users have been created successfully.";
