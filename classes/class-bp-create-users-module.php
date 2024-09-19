@@ -193,9 +193,34 @@ class BP_Create_Users_Module {
                                 break;
 
                             case 'gender':
-                                // Set gender field with predefined values (Male, Female, Other)
-                                $genders = array( 'Male', 'Female', 'Other' );
-                                $random_options = $genders[ array_rand( $genders ) ];
+                                // Dynamically fetch and assign available gender options
+                                if ( ! empty( $options ) ) {
+                                    // Randomly select one of the available gender options
+                                    $random_gender_option = $options[ array_rand( $options ) ]->name;
+                                    
+                                    // Check if the gender field has a valid option order or custom key
+                                    if ( isset( $options[0] ) && isset( $options[0]->option_order ) ) {
+                                        // Get the option order or assign based on the key (e.g., Male, Female, Other)
+                                        foreach ( $options as $index => $option ) {
+                                            if ( $option->name === $random_gender_option ) {
+                                                $option_order = $option->option_order;
+                                                break;
+                                            }
+                                        }
+
+                                        // Apply the correct prefix based on the option order
+                                        if ( '1' === $option_order ) {
+                                            $random_options = 'his_' . $random_gender_option;
+                                        } elseif ( '2' === $option_order ) {
+                                            $random_options = 'her_' . $random_gender_option;
+                                        } else {
+                                            $random_options = 'their_' . $random_gender_option;
+                                        }
+                                    } else {
+                                        // Default to using just the name without prefix if option order isn't available
+                                        $random_options = $random_gender_option;
+                                    }
+                                }
                                 break;
 
                             case 'member-types':
