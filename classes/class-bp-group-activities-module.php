@@ -2,7 +2,7 @@
 
 class BP_Group_Activities_Module {
 
-    public function create_group_activities( $min_activities = 5, $by_admin = true ) {
+    public function create_group_activities( $percent_groups = 50, $by_admin = true ) {
         global $wpdb;
 
         if ( ! bp_is_active( 'groups' ) || ! bp_is_active( 'activity' ) ) {
@@ -62,14 +62,21 @@ class BP_Group_Activities_Module {
             "I have promises to keep, and miles to go before I sleep. - Robert Frost"
         );
 
-        // Get all groups using a SQL query
+        // Get all groups using SQL query
         $groups = $wpdb->get_results( "SELECT id FROM {$wpdb->prefix}bp_groups" );
 
         if ( empty( $groups ) ) {
             return;
         }
 
-        foreach ( $groups as $group ) {
+        // Calculate the number of groups to process based on the percentage
+        $total_groups = count( $groups );
+        $groups_to_process = round( ( $percent_groups / 100 ) * $total_groups );
+
+        // Shuffle the groups to randomly pick the percentage of groups
+        shuffle( $groups );
+
+        foreach ( array_slice( $groups, 0, $groups_to_process ) as $group ) {
             // Get members or admins based on the $by_admin flag
             if ( $by_admin ) {
                 // Get group admins using a SQL query
@@ -109,10 +116,18 @@ class BP_Group_Activities_Module {
                     continue; // Skip invalid members
                 }
 
-                // Create the required number of activities for each member or admin
-                for ( $i = 1; $i <= $min_activities; $i++ ) {
+                // Generate a random number of activities (0 to 10)
+                $num_activities = rand( 0, 10 );
+
+                // Create the random number of activities for each member or admin
+                for ( $i = 1; $i <= $num_activities; $i++ ) {
                     $quote = $poem_quotes[ array_rand( $poem_quotes ) ];
 
+                    // Generate a random date between today and 30 days ago
+                    $random_timestamp = rand( strtotime( '-30 days' ), time() );
+                    $random_date = date( 'Y-m-d H:i:s', $random_timestamp );
+
+                    // Add the activity with the random date
                     bp_activity_add( array(
                         'user_id' => $user_id,
                         'content' => $quote,
@@ -120,6 +135,7 @@ class BP_Group_Activities_Module {
                         'type' => 'activity_update',
                         'item_id' => $group->id,
                         'secondary_item_id' => $group->id,
+                        'date_recorded' => $random_date, // Set the random date
                     ));
                 }
             }
