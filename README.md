@@ -49,9 +49,11 @@ To create 200 groups with 70% public, 25% private, and 5% hidden:
 
 **Usage:**
 
-    wp bp create_group_activities --min=5
+    wp bp create_group_activities --min_activities=5 --by_admin=true
 
-`--min`: (Optional) Minimum number of activities per group. Defaults to 5.
+`--min_activities`: (Optional) Specifies the minimum number of activities to be created per member or admin in each group. Defaults to 5 if not provided.
+
+`--by_admin`: (Optional) Determines whether activities should be created by group admins or random group members. Set to true to use admins, or false to use members. Defaults to true.
 
 ### 4. BP_Messages_Module
 
