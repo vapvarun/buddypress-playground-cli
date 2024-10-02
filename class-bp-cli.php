@@ -63,11 +63,27 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
         }
 
         public function create_group_activities( $args, $assoc_args ) {
+            // Get the number of activities to create (default is 5)
             $min_activities = isset( $assoc_args['min_activities'] ) ? (int) $assoc_args['min_activities'] : 5;
+        
+            // Check if the activities should be created by admins (default is true)
+            $by_admin = isset( $assoc_args['by_admin'] ) ? filter_var( $assoc_args['by_admin'], FILTER_VALIDATE_BOOLEAN ) : true;
+        
+            // Create an instance of the BP_Group_Activities_Module class
             $group_activities_module = new BP_Group_Activities_Module();
-            $group_activities_module->create_group_activities_by_admins( $min_activities );
-            WP_CLI::success( "Created $min_activities activities for each group admin." );
-        }
+        
+            // Call the updated method with the $by_admin parameter
+            $group_activities_module->create_group_activities( $min_activities, $by_admin );
+        
+            // Output a success message based on whether activities were created by admins or random members
+            $creator = $by_admin ? 'group admin' : 'random group member';
+            WP_CLI::success( "Created $min_activities activities for each $creator." );
+        
+            // Additional feedback if needed
+            if ( empty( $group_activities_module ) ) {
+                WP_CLI::error( "No activities were created. Please check your group configuration or try again." );
+            }
+        }           
         
         public function create_forums_with_topics_replies( $args, $assoc_args ) {
             $forum_count  = isset( $assoc_args['forum_count'] ) ? (int) $assoc_args['forum_count'] : 10;

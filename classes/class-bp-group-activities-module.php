@@ -2,7 +2,9 @@
 
 class BP_Group_Activities_Module {
 
-    public function create_group_activities_by_admins( $min_activities = 5 ) {
+    public function create_group_activities( $min_activities = 5, $by_admin = true ) {
+        global $wpdb;
+
         if ( ! bp_is_active( 'groups' ) || ! bp_is_active( 'activity' ) ) {
             return;
         }
@@ -60,27 +62,59 @@ class BP_Group_Activities_Module {
             "I have promises to keep, and miles to go before I sleep. - Robert Frost"
         );
 
-        // Get all groups
-        $groups = groups_get_groups( array( 'show_hidden' => true ) );
+        // Get all groups using a SQL query
+        $groups = $wpdb->get_results( "SELECT id FROM {$wpdb->prefix}bp_groups" );
 
-        if ( empty( $groups['groups'] ) ) {
+        if ( empty( $groups ) ) {
             return;
         }
 
-        foreach ( $groups['groups'] as $group ) {
-            // Get the group admin or owner
-            $admin_ids = groups_get_group_admins( $group->id );
-            if ( empty( $admin_ids ) ) {
+        foreach ( $groups as $group ) {
+            // Get members or admins based on the $by_admin flag
+            if ( $by_admin ) {
+                // Get group admins using a SQL query
+                $members = $wpdb->get_results( 
+                    $wpdb->prepare( 
+                        "
+                        SELECT user_id
+                        FROM {$wpdb->prefix}bp_groups_members
+                        WHERE group_id = %d AND is_admin = 1 AND is_confirmed = 1 AND is_banned = 0
+                        ", 
+                        $group->id 
+                    )
+                );
+            } else {
+                // Get all confirmed, non-banned group members using a SQL query
+                $members = $wpdb->get_results( 
+                    $wpdb->prepare( 
+                        "
+                        SELECT user_id
+                        FROM {$wpdb->prefix}bp_groups_members
+                        WHERE group_id = %d AND is_confirmed = 1 AND is_banned = 0
+                        ", 
+                        $group->id 
+                    )
+                );
+            }
+
+            if ( empty( $members ) ) {
                 continue;
             }
 
-            foreach ( $admin_ids as $admin ) {
-                // Create the required number of activities by the group admin or owner
+            foreach ( $members as $member ) {
+                $user_id = $member->user_id;
+
+                // Validate user_id before creating activities
+                if ( empty( $user_id ) || ! is_numeric( $user_id ) || $user_id <= 0 ) {
+                    continue; // Skip invalid members
+                }
+
+                // Create the required number of activities for each member or admin
                 for ( $i = 1; $i <= $min_activities; $i++ ) {
                     $quote = $poem_quotes[ array_rand( $poem_quotes ) ];
 
                     bp_activity_add( array(
-                        'user_id' => $admin->user_id,
+                        'user_id' => $user_id,
                         'content' => $quote,
                         'component' => 'groups',
                         'type' => 'activity_update',
