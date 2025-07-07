@@ -94,7 +94,7 @@ final class BuddyPress_Playground {
         require_once BP_PLAYGROUND_PLUGIN_DIR . 'includes/interfaces/interface-bp-playground-module.php';
         require_once BP_PLAYGROUND_PLUGIN_DIR . 'includes/abstracts/abstract-bp-playground-module.php';
 
-        // Modules
+        // Core modules (essential)
         require_once BP_PLAYGROUND_PLUGIN_DIR . 'includes/modules/class-bp-playground-users-module.php';
         require_once BP_PLAYGROUND_PLUGIN_DIR . 'includes/modules/class-bp-playground-xprofile-module.php';
         require_once BP_PLAYGROUND_PLUGIN_DIR . 'includes/modules/class-bp-playground-groups-module.php';
@@ -102,8 +102,10 @@ final class BuddyPress_Playground {
         require_once BP_PLAYGROUND_PLUGIN_DIR . 'includes/modules/class-bp-playground-messages-module.php';
         require_once BP_PLAYGROUND_PLUGIN_DIR . 'includes/modules/class-bp-playground-friends-module.php';
         require_once BP_PLAYGROUND_PLUGIN_DIR . 'includes/modules/class-bp-playground-bbpress-module.php';
-        require_once BP_PLAYGROUND_PLUGIN_DIR . 'includes/modules/class-bp-playground-social-network-module.php';
-        require_once BP_PLAYGROUND_PLUGIN_DIR . 'includes/modules/class-bp-playground-settings-module.php';
+
+        // Optional modules (can be removed/commented out)
+        // require_once BP_PLAYGROUND_PLUGIN_DIR . 'includes/modules/class-bp-playground-social-network-module.php';
+        // require_once BP_PLAYGROUND_PLUGIN_DIR . 'includes/modules/class-bp-playground-settings-module.php';
 
         // CLI commands
         if (defined('WP_CLI') && WP_CLI) {
@@ -131,8 +133,10 @@ final class BuddyPress_Playground {
             'messages' => new BP_Playground_Messages_Module(),
             'friends' => new BP_Playground_Friends_Module(),
             'bbpress' => new BP_Playground_BBPress_Module(),
-            'social_network' => new BP_Playground_Social_Network_Module(),
-            'settings' => new BP_Playground_Settings_Module(),
+            
+            // Optional modules - can be removed
+            // 'social_network' => new BP_Playground_Social_Network_Module(),
+            // 'settings' => new BP_Playground_Settings_Module(),
         ];
     }
 
