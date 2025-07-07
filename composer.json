@@ -1,0 +1,73 @@
+{
+  "name": "wbcomdesigns/buddypress-playground-cli",
+  "description": "Comprehensive BuddyPress and bbPress test data generator for addon development and testing",
+  "type": "wordpress-plugin",
+  "keywords": [
+    "wordpress",
+    "buddypress",
+    "bbpress",
+    "testing",
+    "data-generation",
+    "cli",
+    "wp-cli",
+    "wbcomdesigns"
+  ],
+  "homepage": "https://github.com/wbcomdesigns/buddypress-playground",
+  "license": "GPL-2.0-or-later",
+  "authors": [
+    {
+      "name": "vapvarun",
+      "email": "varun@wbcomdesigns.com",
+      "homepage": "https://wbcomdesigns.com",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/wbcomdesigns/buddypress-playground/issues",
+    "forum": "https://wordpress.org/support/plugin/buddypress-playground",
+    "docs": "https://github.com/wbcomdesigns/buddypress-playground/wiki",
+    "source": "https://github.com/wbcomdesigns/buddypress-playground"
+  },
+  "require": {
+    "php": ">=7.4",
+    "composer/installers": "^1.0 || ^2.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.0",
+    "wp-coding-standards/wpcs": "^2.0",
+    "dealerdirect/phpcodesniffer-composer-installer": "^0.7",
+    "phpcompatibility/phpcompatibility-wp": "^2.0"
+  },
+  "config": {
+    "allow-plugins": {
+      "composer/installers": true,
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    },
+    "sort-packages": true
+  },
+  "extra": {
+    "installer-name": "buddypress-playground"
+  },
+  "autoload": {
+    "psr-4": {
+      "BuddyPress\\Playground\\": "includes/"
+    },
+    "files": [
+      "buddypress-playground.php"
+    ]
+  },
+  "scripts": {
+    "phpcs": [
+      "phpcs --standard=WordPress --extensions=php --ignore=*/vendor/*,*/node_modules/* ."
+    ],
+    "phpcbf": [
+      "phpcbf --standard=WordPress --extensions=php --ignore=*/vendor/*,*/node_modules/* ."
+    ],
+    "test": [
+      "phpunit"
+    ],
+    "test-coverage": [
+      "phpunit --coverage-html coverage"
+    ]
+  }
+}

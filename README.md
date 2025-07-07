@@ -1,160 +1,501 @@
 # BuddyPress Playground CLI
 
-BuddyPress Playground CLI is a WordPress plugin that helps you generate test data for your BuddyPress installation. This plugin includes several modules that can create random activities, group activities, messages, connections, group members, and more. It is designed to help developers test the BuddyPress functionality thoroughly.
+A comprehensive WordPress plugin for generating realistic BuddyPress and bbPress test data for addon development and testing.
+
+**Author:** vapvarun  
+**Website:** [Wbcom Designs](https://wbcomdesigns.com)  
+**GitHub:** [wbcomdesigns/buddypress-playground](https://github.com/wbcomdesigns/buddypress-playground)
+
+## Features
+
+- **Comprehensive Data Generation**: Create users, groups, activities, messages, forums, and more
+- **Realistic Data Models**: Generate data that mimics real-world usage patterns
+- **XProfile System**: Complete extended profile field generation with all field types
+- **Batch Processing**: Efficient handling of large datasets with memory management
+- **Multiple Scenarios**: Pre-configured scenarios for different testing needs
+- **CLI Integration**: Full WP-CLI support for automation and scripting
+- **Data Integrity**: Maintains proper relationships between all components
+- **Cleanup Tools**: Comprehensive cleanup options with safety checks
+- **Performance Optimized**: Handles large datasets efficiently
+- **Detailed Logging**: Comprehensive logging system for debugging and monitoring
+
+## Requirements
+
+- WordPress 5.0+
+- PHP 7.4+
+- BuddyPress (latest version recommended)
+- WP-CLI (for command-line functionality)
+- bbPress (optional, for forum data generation)
 
 ## Installation
 
-1. **Download or Clone the Repository:** Place the `buddypress-playground-cli` directory in the `wp-content/mu-plugins/` directory of your WordPress installation.
-2. **Activate BuddyPress:** Ensure that the BuddyPress plugin is active on your WordPress site.
+1. Download or clone the plugin files
+2. Upload to your WordPress plugins directory
+3. Activate the plugin through WordPress admin
+4. Ensure BuddyPress is installed and activated
+5. Install WP-CLI if not already available
 
-## Modules
+## Quick Start
 
-This plugin includes several modules, each designed to generate specific types of data within BuddyPress. Below are the available modules and how to use them:
+### Generate a Complete Testing Environment
 
-### 1. BP_Groups_Module
+```bash
+# Generate medium-scale community data
+wp bp playground generate-all
 
-**Description:** Generates random BuddyPress groups with a specified number of groups and assigns random users as group admins. The groups can be public, private, or hidden based on the specified percentages.
+# Generate small community for quick testing
+wp bp playground generate-all --scale=small
 
-**Usage:**
+# Generate large dataset for performance testing
+wp bp playground generate-all --scale=large --users=10000 --groups=500
+```
 
-    wp bp create_groups --count=200 --public=70 --private=25 --hidden=5
+### Use Predefined Scenarios
 
-`--count`: (Optional) Total number of groups to create. Defaults to 200.
+```bash
+# Perfect for addon development
+wp bp playground scenario addon-testing
 
-`--public`: (Optional) Percentage of groups to be public. Defaults to 70%.
+# Small community setup
+wp bp playground scenario small-community
 
-`--private`: (Optional) Percentage of groups to be private. Defaults to 25%.
+# Medium community with balanced data
+wp bp playground scenario medium-community
 
-`--hidden`: (Optional) Percentage of groups to be hidden. Defaults to 5%.
+# Large community for stress testing
+wp bp playground scenario large-community
+```
 
-**Example:**
+## Command Reference
 
-To create 200 groups with 70% public, 25% private, and 5% hidden:
+### Main Commands
 
-    wp bp create_groups --count=200 --public=70 --private=25 --hidden=5
+#### `wp bp playground generate-all`
 
-### 2. BP_Activities_Module
+Generate comprehensive BuddyPress test data.
 
-**Description:** Creates random activities posted by random users. The content of the activities is based on random quotes from famous English poems.
+**Options:**
+- `--scale=<scale>`: Scale of generation (small, medium, large, enterprise)
+- `--users=<count>`: Number of users to generate
+- `--groups=<count>`: Number of groups to generate
+- `--activities=<count>`: Number of activities to generate
+- `--messages=<count>`: Number of messages to generate
+- `--forums=<count>`: Number of forums to generate
+- `--dry-run`: Preview what would be generated without creating data
+- `--skip-components=<list>`: Comma-separated list of components to skip
 
-**Usage:**
+**Examples:**
+```bash
+# Basic medium-scale generation
+wp bp playground generate-all
 
-    wp bp create_activities --count=50
+# Large-scale with custom parameters
+wp bp playground generate-all --scale=large --users=15000 --groups=750
 
-`--count`: (Optional) Number of activities to create. Defaults to 50.
+# Preview generation plan
+wp bp playground generate-all --dry-run
+```
 
-### 3. BP_Group_Activities_Module
+#### `wp bp playground scenario <scenario-name>`
 
-**Description:** Creates group activities, ensuring that each group has a minimum of 5 activities posted by the group admin or owner. The content is based on random quotes from famous English poems.
+Generate data using predefined scenarios.
 
-**Usage:**
+**Available Scenarios:**
+- `small-community`: 500 users, 25 groups, 10K activities
+- `medium-community`: 2K users, 100 groups, 50K activities  
+- `large-community`: 10K users, 500 groups, 200K activities
+- `addon-testing`: Optimized for comprehensive addon testing
 
-    wp bp create_group_activities --percent_groups=50 --by_admin=true
+**Options:**
+- `--dry-run`: Preview scenario without generating data
+- `--customize=<json>`: JSON string of custom parameters
 
-`--percent_groups`: Specifies the percentage of groups to process.
+**Examples:**
+```bash
+# Generate addon testing scenario
+wp bp playground scenario addon-testing
 
-`--by_admin`: (Optional) Determines whether activities should be created by group admins or random group members. Set to true to use admins, or false to use members. Defaults to true.
+# Customize scenario parameters
+wp bp playground scenario medium-community --customize='{"users":3000,"groups":150}'
+```
 
-### 4. BP_Messages_Module
+### Component-Specific Commands
 
-**Description:** Generates random messages between users. The content of the messages is based on random historical facts. The module also randomly decides whether the recipient should reply, simulating multi-user threads.
+#### `wp bp playground users`
 
-**Usage:**
+Generate users with realistic profiles.
 
-    wp bp create_messages --count=200
+**Options:**
+- `--count=<number>`: Number of users to create (default: 1000)
+- `--with-avatar`: Generate avatar placeholders
+- `--with-cover-image`: Generate cover image placeholders
+- `--activation-rate=<rate>`: Percentage of users to activate (0.0-1.0)
+- `--admin-rate=<rate>`: Percentage of users to make admins (0.0-0.1)
 
-`--count`: (Optional) Number of messages to create. Defaults to 200.
+```bash
+# Generate 500 users with avatars
+wp bp playground users --count=500 --with-avatar
 
-### 5. BP_Connections_Module
+# Generate users with 90% activation rate
+wp bp playground users --count=1000 --activation-rate=0.9
+```
 
-**Description:** Creates random connections (friendships) between users. The module ensures a 70:30 ratio of confirmed friendships to pending requests.
+#### `wp bp playground groups`
 
-**Usage:**
+Generate groups with realistic membership patterns.
 
-    wp bp create_connections --count=200
+**Options:**
+- `--count=<number>`: Number of groups to create
+- `--types=<types>`: Group types (public, private, hidden, mixed)
+- `--with-hierarchy`: Create parent-child group relationships
+- `--membership-patterns`: Use realistic membership distribution
 
-`--count`: (Optional) Number of connections to create. Defaults to 200.
+```bash
+# Generate 100 mixed-type groups
+wp bp playground groups --count=100 --types=mixed
 
-### 6. BP_Activity_Comments_Module
+# Generate groups with hierarchical structure
+wp bp playground groups --count=50 --with-hierarchy
+```
 
-**Description:** Creates random comments on activities, using historical quotes. Each comment’s date is randomly selected to be between the activity’s posting date and now. The comment authors are random users.
+#### `wp bp playground activities`
 
-**Usage:**
+Generate activity stream data.
 
-    wp bp create_activity_comments --count=100
+**Options:**
+- `--count=<number>`: Number of activities to create
+- `--with-mentions`: Include @mentions in activities
+- `--favorite-rate=<rate>`: Percentage of activities to favorite
+- `--comment-rate=<rate>`: Percentage of activities to comment on
 
-`--count`: (Optional) Number of comments to create. Defaults to 100.
+```bash
+# Generate 25,000 activities with mentions
+wp bp playground activities --count=25000 --with-mentions
 
-### 7. BP_Group_Members_Module
+# Generate activities with high engagement
+wp bp playground activities --count=10000 --favorite-rate=0.2 --comment-rate=0.3
+```
 
-**Description:** Adds random users to BuddyPress groups, ensuring that each group has between 5 and 40 members.
+### Information Commands
 
-**Usage:**
+#### `wp bp playground info`
 
-    wp bp add_group_members
+Display system information and plugin status.
 
-- No additional parameters are needed.
+**Options:**
+- `--format=<format>`: Output format (table, json, yaml)
 
-### 8. BP_Update_Last_Activity_Module
+```bash
+# Display system info
+wp bp playground info
 
-**Description:** Updates the last activity timestamp for all users in batches. This ensures that all users appear in the BuddyPress member directory based on their last activity. The process is done in batches to prevent server overload.
+# Export system info as JSON
+wp bp playground info --format=json
+```
 
-**Usage:**
+#### `wp bp playground stats`
 
-    wp bp update_last_activity --batch_size=1000
+Display comprehensive statistics about generated data.
 
-`--batch_size`: (Optional) The number of users to process in each batch. Defaults to 1000.
+**Options:**
+- `--format=<format>`: Output format (table, json, yaml)
+- `--detailed`: Show detailed statistics for each component
 
-**Example:**
+```bash
+# Basic statistics
+wp bp playground stats
 
-To update the last activity timestamp for all users, processing them in batches of 1000:
+# Detailed component statistics
+wp bp playground stats --detailed
 
-    wp bp update_last_activity --batch_size=1000
+# Export stats as JSON
+wp bp playground stats --format=json
+```
 
-### 9. BP_Create_Users_Module
+#### `wp bp playground list-scenarios`
 
-**Description:** Generates a specified number of users with random first names, last names, and unique usernames. Each user also has a randomly assigned 2-liner bio.
+List all available scenarios with descriptions.
 
-**Usage:**
+```bash
+# View available scenarios
+wp bp playground list-scenarios
+```
 
-    wp bp create_users --count=500
+### Maintenance Commands
 
-- `--count`: (Optional) The number of users to create. Defaults to 500.
+#### `wp bp playground cleanup`
 
-**Example:**
+Clean up generated test data.
 
-To create 500 users with random names, usernames, and bios:
+**Options:**
+- `<component>`: Specific component to clean (users, groups, activities, etc.)
+- `--older-than=<days>`: Only clean data older than specified days
+- `--dry-run`: Show what would be cleaned without actually doing it
+- `--force`: Skip confirmation prompts
 
-    wp bp create_users --count=500
+**Examples:**
+```bash
+# Clean all generated data (with confirmation)
+wp bp playground cleanup
 
-This command will create a set of users with diverse profiles, useful for populating a BuddyPress site for testing or demo purposes.
+# Clean only activities older than 30 days
+wp bp playground cleanup activities --older-than=30
 
-### 10. BP_BBPress_Module
+# Preview cleanup operation
+wp bp playground cleanup --dry-run
 
-**Description:** Creates bbPress forum topics and replies using random historical and war facts. Topics are created with historical facts as the title, and replies are created using war facts.
+# Force cleanup without prompts
+wp bp playground cleanup --force
+```
 
-**Usage:**
+#### `wp bp playground verify`
 
-    wp bp create_forums_with_topics_replies --forum_count=10 --min_topics=10 --max_topics=15 --min_replies=3 --max_replies=7
+Verify data integrity and relationships.
 
-`--forum_count`: (Optional) Number of forums to create. Defaults to 10.
+**Options:**
+- `--fix`: Attempt to fix found issues automatically
+- `--relationships`: Check relationship integrity between components
 
-`--min_topics`: (Optional) Minimum number of topics to create per forum. Defaults to 10.
+```bash
+# Basic integrity check
+wp bp playground verify
 
-`--max_topics`: (Optional) Maximum number of topics to create per forum. Defaults to 15.
+# Check and fix relationship issues
+wp bp playground verify --relationships --fix
+```
 
-`--min_replies`: (Optional) Minimum number of replies per topic. Defaults to 3.
+### Import/Export Commands
 
-`--max_replies`: (Optional) Maximum number of replies per topic. Defaults to 7.
+#### `wp bp playground export`
 
-## Running Commands
+Export scenario configuration to JSON file.
 
-To use the above commands, please ensure you have WP-CLI installed and running on your WordPress installation. Please go ahead and execute the commands from your terminal in the root directory of your WordPress site.
+**Options:**
+- `<scenario>`: Scenario name to export
+- `--file=<file>`: Output file path
+- `--customize=<params>`: Custom parameters to include
+
+```bash
+# Export addon testing scenario
+wp bp playground export addon-testing
+
+# Export with custom file name
+wp bp playground export medium-community --file=my-scenario.json
+```
+
+## Plugin Architecture
+
+### Core Components
+
+1. **Core Module** (`BP_Playground_Core`): Central coordination and settings management
+2. **Batch Processor** (`BP_Playground_Batch_Processor`): Efficient large dataset processing
+3. **Logger** (`BP_Playground_Logger`): Comprehensive logging system
+4. **Data Model** (`BP_Playground_Data_Model`): Realistic data generation patterns
+
+### Generation Modules
+
+1. **Users Module**: Create users with realistic personas and profiles
+2. **XProfile Module**: Generate complete extended profile systems
+3. **Groups Module**: Create groups with realistic membership patterns
+4. **Activities Module**: Generate activity streams with proper relationships
+5. **Messages Module**: Create private message threads and conversations
+6. **Friends Module**: Generate social network connections
+7. **bbPress Module**: Create forums, topics, and replies
+8. **Social Network Module**: Model realistic user interaction patterns
+
+### CLI Commands
+
+Organized command structure with comprehensive help and validation:
+- Main commands for common operations
+- Component-specific commands for targeted generation
+- Maintenance commands for cleanup and verification
+- Information commands for monitoring and statistics
+
+## Configuration
+
+### Settings
+
+Plugin settings can be configured through the core module:
+
+```php
+$core = bp_playground_get_module('core');
+$core->update_settings([
+    'batch_size' => 100,
+    'memory_limit' => '1024M',
+    'enable_logging' => true,
+    'log_level' => 'info',
+]);
+```
+
+### Scenarios
+
+Scenarios are predefined configurations optimized for different use cases:
+
+- **Small Community**: Quick testing with minimal data
+- **Medium Community**: Balanced dataset for most testing needs
+- **Large Community**: Performance testing with substantial data
+- **Addon Testing**: Comprehensive coverage for addon development
+
+## Data Generation Patterns
+
+### User Personas
+
+The plugin generates users based on realistic personas:
+
+- **Tech Professionals** (25%): Developers, engineers, technical roles
+- **Creative Professionals** (20%): Designers, artists, creative roles
+- **Business Professionals** (20%): Managers, consultants, business roles
+- **Educators** (15%): Teachers, instructors, academic roles
+- **Students** (20%): Various educational levels and interests
+
+### Relationship Modeling
+
+- **Social Networks**: Realistic friend connection patterns
+- **Group Membership**: Natural distribution across group types and sizes
+- **Activity Patterns**: Authentic engagement and interaction flows
+- **Content Distribution**: 80/20 rule for content popularity
+
+### Data Integrity
+
+- **Referential Integrity**: All relationships properly maintained
+- **Cascade Operations**: Proper cleanup of dependent data
+- **Validation**: Input validation and error handling
+- **Performance**: Optimized queries and batch processing
+
+## Performance Considerations
+
+### Memory Management
+
+- Configurable memory limits
+- Automatic garbage collection
+- Batch processing for large datasets
+- Progress tracking and reporting
+
+### Database Optimization
+
+- Efficient batch inserts
+- Proper indexing strategies
+- Transaction management
+- Connection pooling
+
+### Scalability
+
+- Support for datasets up to 25,000+ users
+- Configurable batch sizes
+- Memory usage monitoring
+- Time limit management
+
+## Logging and Monitoring
+
+### Log Levels
+
+- **Debug**: Detailed execution information
+- **Info**: General operation information
+- **Warning**: Potential issues or concerns
+- **Error**: Operation failures
+- **Critical**: System-level problems
+
+### Log Storage
+
+- Database logging with automatic rotation
+- File-based logging option
+- Export capabilities (CSV, JSON)
+- Automatic cleanup of old logs
+
+### Monitoring
+
+- Real-time progress tracking
+- Memory usage monitoring
+- Performance metrics
+- Error rate tracking
+
+## Security Considerations
+
+### Data Protection
+
+- No real user data exposure
+- Placeholder avatars and images
+- Safe email domain usage
+- IP address logging controls
+
+### Access Control
+
+- WP-CLI requirement for operations
+- Admin capability checks
+- Confirmation prompts for destructive operations
+- Dry-run options for testing
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Memory Limit Errors**
+   - Increase PHP memory limit
+   - Reduce batch size
+   - Use smaller dataset scales
+
+2. **Time Limit Errors**
+   - Increase PHP max execution time
+   - Use WP-CLI instead of web interface
+   - Process in smaller batches
+
+3. **Database Connection Errors**
+   - Check database connectivity
+   - Verify MySQL timeout settings
+   - Reduce concurrent operations
+
+### Debug Mode
+
+Enable debug logging for detailed troubleshooting:
+
+```bash
+wp bp playground info --format=json
+wp bp playground stats --detailed
+```
+
+### Log Analysis
+
+Review logs for issues:
+
+```bash
+# View recent logs
+wp option get bp_playground_settings
+
+# Export logs for analysis
+wp bp playground export-logs --since=yesterday
+```
 
 ## Contributing
 
-Contributions are welcome! Please submit pull requests or issues on GitHub if you have suggestions or improvements.
+Contributions are welcome! Please follow these guidelines:
+
+1. Follow WordPress coding standards
+2. Add comprehensive PHPDoc comments
+3. Include unit tests for new features
+4. Update documentation for changes
+5. Test with multiple BuddyPress configurations
 
 ## License
 
-This plugin is licensed under the GPL-2.0+ License. See the LICENSE file for more information.
+This plugin is licensed under the GPL v2 or later.
+
+## Support
+
+For support, please:
+
+1. Check the documentation
+2. Review the logs for errors
+3. Use the verify command to check data integrity
+4. Submit issues with detailed error information
+
+## Changelog
+
+### Version 1.0.0
+- Initial release
+- Complete BuddyPress data generation
+- XProfile system support
+- Batch processing implementation
+- CLI command structure
+- Logging system
+- Cleanup utilities
+- Performance optimizations
