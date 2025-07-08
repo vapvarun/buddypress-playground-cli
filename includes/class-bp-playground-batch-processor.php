@@ -368,9 +368,27 @@ class BP_Playground_Batch_Processor {
      */
     private function finish_operation($results) {
         $duration = round($results['duration'], 2);
-        $memory_peak = max($results['memory_usage']);
+        
+        // Fix: Extract actual memory values from the memory_usage array
+        $memory_peak = 0;
+        if (!empty($results['memory_usage'])) {
+            foreach ($results['memory_usage'] as $memory_info) {
+                if (is_array($memory_info) && isset($memory_info['peak'])) {
+                    $memory_peak = max($memory_peak, $memory_info['peak']);
+                } elseif (is_numeric($memory_info)) {
+                    $memory_peak = max($memory_peak, $memory_info);
+                }
+            }
+        }
+        
+        // Fallback to current peak memory if no recorded values
+        if ($memory_peak === 0) {
+            $memory_peak = memory_get_peak_usage(true);
+        }
+        
         $items_per_second = $results['duration'] > 0 ? round($results['processed_items'] / $results['duration'], 2) : 0;
 
+        $operation = isset($this->current_operation['operation']) ? $this->current_operation['operation'] : 'Unknown';
         $this->log(sprintf(
             'Batch operation completed: %d/%d items processed in %s seconds (%.2f items/sec), peak memory: %s',
             $results['successful_items'],
@@ -546,10 +564,19 @@ class BP_Playground_Batch_Processor {
      * Format bytes to human readable string
      *
      * @since 1.0.0
-     * @param int $bytes Number of bytes
+     * @param int|float $bytes Number of bytes
      * @return string Formatted string
      */
     private function format_bytes($bytes) {
+        // Ensure $bytes is numeric
+        if (!is_numeric($bytes)) {
+            return '0 B';
+        }
+        
+        if ($bytes === 0) {
+            return '0 B';
+        }
+
         $units = ['B', 'KB', 'MB', 'GB'];
         $bytes = max($bytes, 0);
         $pow = floor(($bytes ? log($bytes) : 0) / log(1024));

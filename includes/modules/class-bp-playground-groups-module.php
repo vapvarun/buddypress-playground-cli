@@ -173,14 +173,14 @@ class BP_Playground_Groups_Module extends BP_Playground_Abstract_Module {
 
         $defaults = [
             'count' => 100,
-            'types' => 'mixed', // mixed, public, private, hidden, course
+            'types' => 'mixed', // Add default value
             'with_hierarchy' => false,
             'membership_patterns' => true,
-            'enable_forums' => 'auto', // auto, true, false
+            'enable_forums' => 'auto', // Add default value
             'member_distribution' => 'realistic',
             'batch_size' => 25,
         ];
-
+    
         $args = wp_parse_args($args, $defaults);
 
         // Validate arguments
@@ -317,8 +317,8 @@ class BP_Playground_Groups_Module extends BP_Playground_Abstract_Module {
         // Seed random generator for consistent data
         mt_srand($group_index);
 
-        // Select group type
-        $group_type = $this->select_group_type($options['types']);
+        // Select group type - with proper array key checking
+        $group_type = $this->select_group_type(isset($options['types']) ? $options['types'] : 'mixed');
         $type_config = $this->group_types[$group_type];
 
         // Select category and name
@@ -335,13 +335,16 @@ class BP_Playground_Groups_Module extends BP_Playground_Abstract_Module {
         // Generate slug
         $slug = sanitize_title($name . '-' . $group_index);
 
-        // Determine forum enablement
+        // Determine forum enablement - with proper array key checking
         $enable_forum = false;
-        if ($options['enable_forums'] === true) {
+        $enable_forums_setting = isset($options['enable_forums']) ? $options['enable_forums'] : 'auto';
+        
+        if ($enable_forums_setting === true) {
             $enable_forum = true;
-        } elseif ($options['enable_forums'] === 'auto') {
+        } elseif ($enable_forums_setting === 'auto') {
             $enable_forum = mt_rand(1, 100) <= ($type_config['enable_forum'] * 100);
         }
+        // If $enable_forums_setting is false, $enable_forum stays false
 
         // Reset random seed
         mt_srand();

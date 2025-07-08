@@ -489,21 +489,36 @@ class BP_Playground_Core {
         $scenarios = [
             'small-community' => [
                 'users' => ['count' => 500, 'with_xprofile' => true],
-                'groups' => ['count' => 25, 'types' => 'mixed'],
+                'groups' => [
+                    'count' => 25, 
+                    'types' => 'mixed',
+                    'enable_forums' => 'auto',
+                    'membership_patterns' => true
+                ],
                 'activities' => ['count' => 10000, 'with_mentions' => true],
                 'messages' => ['count' => 2000],
                 'bbpress' => ['forums' => 15, 'topics_per_forum' => 33],
             ],
             'medium-community' => [
                 'users' => ['count' => 2000, 'with_xprofile' => true],
-                'groups' => ['count' => 100, 'types' => 'mixed'],
+                'groups' => [
+                    'count' => 100, 
+                    'types' => 'mixed',
+                    'enable_forums' => 'auto',
+                    'membership_patterns' => true
+                ],
                 'activities' => ['count' => 50000, 'with_mentions' => true],
                 'messages' => ['count' => 8000],
                 'bbpress' => ['forums' => 40, 'topics_per_forum' => 50],
             ],
             'large-community' => [
                 'users' => ['count' => 10000, 'with_xprofile' => true],
-                'groups' => ['count' => 500, 'types' => 'mixed'],
+                'groups' => [
+                    'count' => 500, 
+                    'types' => 'mixed',
+                    'enable_forums' => 'auto',
+                    'membership_patterns' => true
+                ],
                 'activities' => ['count' => 200000, 'with_mentions' => true],
                 'messages' => ['count' => 25000],
                 'bbpress' => ['forums' => 100, 'topics_per_forum' => 100],
@@ -511,20 +526,26 @@ class BP_Playground_Core {
             'addon-testing' => [
                 'users' => ['count' => 500, 'with_xprofile' => true, 'member_types' => true],
                 'xprofile' => ['field_groups' => 8, 'fields_per_group' => 10],
-                'groups' => ['count' => 50, 'types' => 'all', 'with_hierarchy' => true],
+                'groups' => [
+                    'count' => 50, 
+                    'types' => 'all', 
+                    'with_hierarchy' => true,
+                    'enable_forums' => true,
+                    'membership_patterns' => true
+                ],
                 'activities' => ['count' => 15000, 'with_mentions' => true, 'favorite_rate' => 0.15],
                 'messages' => ['count' => 3000, 'thread_variations' => true],
                 'bbpress' => ['forums' => 20, 'hierarchy_depth' => 3, 'with_tags' => true],
             ],
         ];
-
+    
         if (!isset($scenarios[$scenario_name])) {
             return new WP_Error(
                 'invalid_scenario',
                 sprintf(__('Unknown scenario: %s', BP_PLAYGROUND_TEXT_DOMAIN), $scenario_name)
             );
         }
-
+    
         return $scenarios[$scenario_name];
     }
 
