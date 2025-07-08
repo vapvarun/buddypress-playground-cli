@@ -206,7 +206,7 @@ final class BuddyPress_Playground {
     }
     
     /**
-     * Create plugin tables
+     * Create plugin tables with complete schema
      */
     private function create_plugin_tables() {
         global $wpdb;
@@ -217,10 +217,19 @@ final class BuddyPress_Playground {
             level varchar(20) NOT NULL DEFAULT 'info',
             message text NOT NULL,
             context longtext,
+            memory_usage bigint(20) unsigned DEFAULT 0,
+            peak_memory bigint(20) unsigned DEFAULT 0,
+            user_id bigint(20) unsigned DEFAULT 0,
+            ip_address varchar(45) DEFAULT '',
+            user_agent text DEFAULT '',
+            request_uri text DEFAULT '',
+            module varchar(50) DEFAULT 'core',
             created_at datetime DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             KEY level (level),
-            KEY created_at (created_at)
+            KEY module (module),
+            KEY created_at (created_at),
+            KEY user_id (user_id)
         ) $charset_collate;";
 
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
