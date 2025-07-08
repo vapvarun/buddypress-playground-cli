@@ -149,7 +149,7 @@ class BP_Playground_Users_Module extends BP_Playground_Abstract_Module {
             $callback = function($start_index, $batch_size, $options) use ($validated_args) {
                 return $this->create_user_batch($start_index, $batch_size, $validated_args);
             };
-
+    
             $progress_callback = function($progress) {
                 $this->show_progress(
                     $progress['processed'], 
@@ -157,25 +157,50 @@ class BP_Playground_Users_Module extends BP_Playground_Abstract_Module {
                     'Creating users'
                 );
             };
-
+    
             $batch_result = $batch_processor->process_in_batches(
                 $validated_args['count'],
                 $callback,
                 $progress_callback
             );
-
+    
             if (is_wp_error($batch_result)) {
                 throw new Exception($batch_result->get_error_message());
             }
-
+    
             $results['users_created'] = $batch_result['successful_items'];
             $results['errors'] = $batch_result['errors'];
-
+    
+            // POPULATE XPROFILE DATA AFTER ALL USERS ARE CREATED
+            if (isset($validated_args['with_xprofile']) && $validated_args['with_xprofile'] && $results['users_created'] > 0) {
+                $this->log('Populating XProfile data for created users...', 'info');
+                
+                $xprofile_module = bp_playground_get_module('xprofile');
+                if ($xprofile_module) {
+                    // Get the user IDs we just created
+                    global $wpdb;
+                    $created_user_ids = $wpdb->get_col(
+                        "SELECT user_id FROM {$wpdb->usermeta} 
+                         WHERE meta_key = 'bp_playground_created' 
+                         ORDER BY meta_id DESC 
+                         LIMIT {$results['users_created']}"
+                    );
+    
+                    if (!empty($created_user_ids)) {
+                        $populate_result = $xprofile_module->populate_profile_data($created_user_ids, 0.85);
+                        if (!is_wp_error($populate_result)) {
+                            $results['users_with_profiles'] = $populate_result;
+                            $this->log("Populated XProfile data for {$populate_result} users", 'info');
+                        }
+                    }
+                }
+            }
+    
         } catch (Exception $e) {
             $results['errors'][] = $e->getMessage();
             $this->log_error('User generation failed: ' . $e->getMessage());
         }
-
+    
         $this->end_generation();
         return $results;
     }

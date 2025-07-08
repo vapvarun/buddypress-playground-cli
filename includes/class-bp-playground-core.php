@@ -425,55 +425,63 @@ class BP_Playground_Core {
      */
     public function generate_scenario($scenario_name, $params = []) {
         $this->start_operation("generate_scenario_{$scenario_name}");
-
+    
         $results = [
             'scenario' => $scenario_name,
             'success' => false,
             'components' => [],
             'errors' => [],
         ];
-
+    
         try {
             $scenario_config = $this->get_scenario_config($scenario_name);
             if (is_wp_error($scenario_config)) {
                 throw new Exception($scenario_config->get_error_message());
             }
-
+    
             // Merge scenario config with provided params
             $config = wp_parse_args($params, $scenario_config);
-
-            // Generate components in dependency order
+    
+            // CRITICAL: Generate components in proper dependency order
+            // XProfile fields MUST be created first!
             $generation_order = [
-                'users',
-                'xprofile',
-                'groups',
-                'friends',
-                'activities',
-                'messages',
-                'bbpress',
+                'xprofile',     // 1. Create XProfile fields FIRST
+                'users',        // 2. Then create users (they need XProfile fields)
+                'groups',       // 3. Create groups (they need users)
+                'friends',      // 4. Create friendships (they need users)
+                'activities',   // 5. Create activities (they need users and groups)
+                'messages',     // 6. Create messages (they need users and friends)
+                'bbpress',      // 7. Create forums last (they need users and groups)
             ];
-
+    
             foreach ($generation_order as $component) {
                 if (isset($config[$component]) && !empty($config[$component])) {
+                    $this->log("Starting {$component} generation...", 'info');
+                    
                     $module = bp_playground_get_module($component);
                     if ($module) {
                         $component_result = $module->generate($config[$component]);
                         $results['components'][$component] = $component_result;
                         
                         if (is_wp_error($component_result)) {
-                            $results['errors'][] = $component_result->get_error_message();
+                            $results['errors'][] = "Error in {$component}: " . $component_result->get_error_message();
+                            $this->log("Error in {$component}: " . $component_result->get_error_message(), 'error');
+                        } else {
+                            $this->log("Completed {$component} generation successfully", 'info');
                         }
+                    } else {
+                        $this->log("Module {$component} not available", 'warning');
                     }
                 }
             }
-
+    
             $results['success'] = empty($results['errors']);
-
+    
         } catch (Exception $e) {
             $this->add_error('Scenario generation failed: ' . $e->getMessage());
             $results['errors'][] = $e->getMessage();
         }
-
+    
         $results['stats'] = $this->end_operation();
         return $results;
     }
@@ -488,44 +496,149 @@ class BP_Playground_Core {
     private function get_scenario_config($scenario_name) {
         $scenarios = [
             'small-community' => [
-                'users' => ['count' => 500, 'with_xprofile' => true],
+                // FIRST: XProfile fields (created before users)
+                'xprofile' => [
+                    'field_groups' => 6,
+                    'fields_per_group' => 8,
+                    'member_types' => true,
+                    'populate_data' => false, // Don't populate yet - users don't exist
+                ],
+                // SECOND: Users (with XProfile fields available)
+                'users' => [
+                    'count' => 500, 
+                    'with_xprofile' => true,
+                    'activation_rate' => 0.95,
+                    'admin_rate' => 0.02
+                ],
+                // THIRD: Groups (need users)
                 'groups' => [
                     'count' => 25, 
                     'types' => 'mixed',
                     'enable_forums' => 'auto',
                     'membership_patterns' => true
                 ],
-                'activities' => ['count' => 10000, 'with_mentions' => true],
-                'messages' => ['count' => 2000],
-                'bbpress' => ['forums' => 15, 'topics_per_forum' => 33],
+                // FOURTH: Friends (need users)
+                'friends' => [
+                    'network_density' => 0.1,
+                    'clustering' => true,
+                    'pending_requests' => true
+                ],
+                // FIFTH: Activities (need users and groups)
+                'activities' => [
+                    'count' => 10000, 
+                    'with_mentions' => true,
+                    'with_comments' => true,
+                    'favorite_rate' => 0.15
+                ],
+                // SIXTH: Messages (need users and friends)
+                'messages' => [
+                    'count' => 2000,
+                    'thread_variations' => true,
+                    'conversation_depth' => 'mixed'
+                ],
+                // SEVENTH: bbPress (need users and groups)
+                'bbpress' => [
+                    'forums' => 15, 
+                    'topics_per_forum' => 33,
+                    'with_tags' => true
+                ],
             ],
             'medium-community' => [
-                'users' => ['count' => 2000, 'with_xprofile' => true],
+                'xprofile' => [
+                    'field_groups' => 8,
+                    'fields_per_group' => 10,
+                    'member_types' => true,
+                    'populate_data' => false,
+                ],
+                'users' => [
+                    'count' => 2000, 
+                    'with_xprofile' => true,
+                    'activation_rate' => 0.93,
+                    'admin_rate' => 0.015
+                ],
                 'groups' => [
                     'count' => 100, 
                     'types' => 'mixed',
                     'enable_forums' => 'auto',
                     'membership_patterns' => true
                 ],
-                'activities' => ['count' => 50000, 'with_mentions' => true],
-                'messages' => ['count' => 8000],
-                'bbpress' => ['forums' => 40, 'topics_per_forum' => 50],
+                'friends' => [
+                    'network_density' => 0.08,
+                    'clustering' => true,
+                    'pending_requests' => true
+                ],
+                'activities' => [
+                    'count' => 50000, 
+                    'with_mentions' => true,
+                    'with_comments' => true,
+                    'favorite_rate' => 0.12
+                ],
+                'messages' => [
+                    'count' => 8000,
+                    'thread_variations' => true,
+                    'conversation_depth' => 'mixed'
+                ],
+                'bbpress' => [
+                    'forums' => 40, 
+                    'topics_per_forum' => 50,
+                    'with_tags' => true
+                ],
             ],
             'large-community' => [
-                'users' => ['count' => 10000, 'with_xprofile' => true],
+                'xprofile' => [
+                    'field_groups' => 10,
+                    'fields_per_group' => 12,
+                    'member_types' => true,
+                    'populate_data' => false,
+                ],
+                'users' => [
+                    'count' => 10000, 
+                    'with_xprofile' => true,
+                    'activation_rate' => 0.90,
+                    'admin_rate' => 0.01
+                ],
                 'groups' => [
                     'count' => 500, 
                     'types' => 'mixed',
                     'enable_forums' => 'auto',
                     'membership_patterns' => true
                 ],
-                'activities' => ['count' => 200000, 'with_mentions' => true],
-                'messages' => ['count' => 25000],
-                'bbpress' => ['forums' => 100, 'topics_per_forum' => 100],
+                'friends' => [
+                    'network_density' => 0.05,
+                    'clustering' => true,
+                    'pending_requests' => true
+                ],
+                'activities' => [
+                    'count' => 200000, 
+                    'with_mentions' => true,
+                    'with_comments' => true,
+                    'favorite_rate' => 0.10
+                ],
+                'messages' => [
+                    'count' => 25000,
+                    'thread_variations' => true,
+                    'conversation_depth' => 'mixed'
+                ],
+                'bbpress' => [
+                    'forums' => 100, 
+                    'topics_per_forum' => 100,
+                    'with_tags' => true
+                ],
             ],
             'addon-testing' => [
-                'users' => ['count' => 500, 'with_xprofile' => true, 'member_types' => true],
-                'xprofile' => ['field_groups' => 8, 'fields_per_group' => 10],
+                'xprofile' => [
+                    'field_groups' => 8, 
+                    'fields_per_group' => 10,
+                    'member_types' => true,
+                    'populate_data' => false,
+                ],
+                'users' => [
+                    'count' => 500, 
+                    'with_xprofile' => true, 
+                    'member_types' => true,
+                    'activation_rate' => 0.98,
+                    'admin_rate' => 0.05
+                ],
                 'groups' => [
                     'count' => 50, 
                     'types' => 'all', 
@@ -533,9 +646,28 @@ class BP_Playground_Core {
                     'enable_forums' => true,
                     'membership_patterns' => true
                 ],
-                'activities' => ['count' => 15000, 'with_mentions' => true, 'favorite_rate' => 0.15],
-                'messages' => ['count' => 3000, 'thread_variations' => true],
-                'bbpress' => ['forums' => 20, 'hierarchy_depth' => 3, 'with_tags' => true],
+                'friends' => [
+                    'network_density' => 0.15,
+                    'clustering' => true,
+                    'pending_requests' => true
+                ],
+                'activities' => [
+                    'count' => 15000, 
+                    'with_mentions' => true, 
+                    'favorite_rate' => 0.15,
+                    'with_comments' => true
+                ],
+                'messages' => [
+                    'count' => 3000, 
+                    'thread_variations' => true,
+                    'conversation_depth' => 'long'
+                ],
+                'bbpress' => [
+                    'forums' => 20, 
+                    'hierarchy_depth' => 3, 
+                    'with_tags' => true,
+                    'topics_per_forum' => 25
+                ],
             ],
         ];
     
