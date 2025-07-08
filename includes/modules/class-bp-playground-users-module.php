@@ -125,6 +125,8 @@ class BP_Playground_Users_Module extends BP_Playground_Abstract_Module {
             'activation_rate' => ['type' => 'float', 'min' => 0.0, 'max' => 1.0],
             'admin_rate' => ['type' => 'float', 'min' => 0.0, 'max' => 0.1],
             'batch_size' => ['type' => 'int', 'min' => 1, 'max' => 200],
+            'with_avatar' => ['type' => 'bool'],
+            'with_cover_image' => ['type' => 'bool'],
         ];
 
         $validated_args = $this->validate_args($args, $validation_rules);
@@ -247,12 +249,17 @@ class BP_Playground_Users_Module extends BP_Playground_Abstract_Module {
         $username = $this->generate_username($first_name, $last_name, $user_index);
         $email = $this->generate_email($username, $persona['domains']);
 
-        // Determine user role
-        $is_admin = (mt_rand() / mt_getrandmax()) < $options['admin_rate'];
+        // Determine user role - with proper array key check
+        $admin_rate = isset($options['admin_rate']) ? $options['admin_rate'] : 0.02;
+        $is_admin = (mt_rand() / mt_getrandmax()) < $admin_rate;
         $role = $is_admin ? 'administrator' : 'subscriber';
 
         // Generate bio
         $bio = $this->generate_bio($persona, $first_name);
+
+        // Determine activation status - with proper array key check
+        $activation_rate = isset($options['activation_rate']) ? $options['activation_rate'] : 0.95;
+        $is_activated = (mt_rand() / mt_getrandmax()) < $activation_rate;
 
         // Reset random seed
         mt_srand();
@@ -266,7 +273,7 @@ class BP_Playground_Users_Module extends BP_Playground_Abstract_Module {
             'role' => $role,
             'bio' => $bio,
             'persona' => $persona_key,
-            'is_activated' => (mt_rand() / mt_getrandmax()) < $options['activation_rate'],
+            'is_activated' => $is_activated,
         ];
     }
 
@@ -314,13 +321,13 @@ class BP_Playground_Users_Module extends BP_Playground_Abstract_Module {
         // Add user meta
         $this->add_user_meta($user_id, $user_data);
 
-        // Handle avatar if requested
-        if ($options['with_avatar']) {
+        // Handle avatar if requested - with proper array key check
+        if (!empty($options['with_avatar'])) {
             $this->maybe_add_avatar($user_id);
         }
 
-        // Handle cover image if requested
-        if ($options['with_cover_image']) {
+        // Handle cover image if requested - with proper array key check
+        if (!empty($options['with_cover_image'])) {
             $this->maybe_add_cover_image($user_id);
         }
 
