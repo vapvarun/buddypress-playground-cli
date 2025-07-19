@@ -393,12 +393,16 @@ class BP_Playground_Friends_Module extends BP_Playground_Abstract_Module {
 
         global $wpdb;
 
-        $user_ids_list = implode(',', array_map('intval', $user_ids));
+        $placeholders = array_fill(0, count($user_ids), '%d');
+        $placeholders_str = implode(',', $placeholders);
         
+        $sql = "SELECT COUNT(*) FROM {$wpdb->base_prefix}bp_friends 
+                WHERE (initiator_user_id IN ({$placeholders_str}) OR friend_user_id IN ({$placeholders_str}))
+                AND is_confirmed = 1";
+        
+        // Prepare with user_ids twice since we use them in two IN clauses
         $count = $wpdb->get_var(
-            "SELECT COUNT(*) FROM {$wpdb->base_prefix}bp_friends 
-             WHERE (initiator_user_id IN ({$user_ids_list}) OR friend_user_id IN ({$user_ids_list}))
-             AND is_confirmed = 1"
+            $wpdb->prepare($sql, array_merge($user_ids, $user_ids))
         );
 
         return intval($count);

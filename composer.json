@@ -53,7 +53,7 @@
       "BuddyPress\\Playground\\": "includes/"
     },
     "files": [
-      "buddypress-playground.php"
+      "buddypress-playground-cli.php"
     ]
   },
   "scripts": {

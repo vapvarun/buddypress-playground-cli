@@ -423,8 +423,9 @@ class BP_Playground_Groups_Module extends BP_Playground_Abstract_Module {
         groups_update_groupmeta($group_id, 'bp_playground_activity_level', $group_data['activity_level']);
 
         // Add some random group settings
+        $invite_options = ['members', 'mods', 'admins'];
         $settings = [
-            'invite_status' => array_rand(['members', 'mods', 'admins']),
+            'invite_status' => $invite_options[array_rand($invite_options)],
             'activity_feed' => mt_rand(0, 1),
             'photo_uploads' => mt_rand(0, 1),
             'cover_image' => mt_rand(0, 1),

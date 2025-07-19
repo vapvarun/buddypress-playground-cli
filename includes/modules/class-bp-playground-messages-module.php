@@ -849,8 +849,10 @@ class BP_Playground_Messages_Module extends BP_Playground_Abstract_Module {
                 $thread_ids_list = implode(',', array_map('intval', $playground_thread_ids));
 
                 // Count playground messages
+                $placeholders = array_fill(0, count($playground_thread_ids), '%d');
+                $sql = "SELECT COUNT(*) FROM {$wpdb->base_prefix}bp_messages_messages WHERE thread_id IN (" . implode(',', $placeholders) . ")";
                 $stats['playground_messages'] = $wpdb->get_var(
-                    "SELECT COUNT(*) FROM {$wpdb->base_prefix}bp_messages_messages WHERE thread_id IN ({$thread_ids_list})"
+                    $wpdb->prepare($sql, $playground_thread_ids)
                 );
 
                 // Calculate average thread length
