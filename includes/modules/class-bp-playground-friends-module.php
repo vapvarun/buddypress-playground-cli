@@ -139,9 +139,21 @@ class BP_Playground_Friends_Module extends BP_Playground_Abstract_Module {
         } catch (Exception $e) {
             $results['errors'][] = $e->getMessage();
             $this->log_error('Friends generation failed: ' . $e->getMessage());
+            $this->end_generation();
+            
+            // Return WP_Error for critical failures
+            if (strpos($e->getMessage(), 'At least 2 users are required') !== false) {
+                return new WP_Error('insufficient_users', $e->getMessage());
+            }
         }
 
         $this->end_generation();
+        
+        // Return WP_Error if no friendships were created and there were errors
+        if ($results['friendships_created'] === 0 && !empty($results['errors'])) {
+            return new WP_Error('friendship_generation_failed', implode(', ', $results['errors']));
+        }
+        
         return $results;
     }
 
@@ -242,8 +254,8 @@ class BP_Playground_Friends_Module extends BP_Playground_Abstract_Module {
             return new WP_Error('friendship_creation_failed', 'Failed to create friendship');
         }
 
-        // Add friendship metadata
-        $this->add_friendship_meta($friendship_id, $initiator_id, $friend_id);
+        // Note: BuddyPress doesn't support friendship metadata out of the box
+        // We'll track this differently if needed
 
         // Set realistic timestamps
         $this->set_friendship_timestamps($friendship_id, $is_pending);
@@ -256,7 +268,11 @@ class BP_Playground_Friends_Module extends BP_Playground_Abstract_Module {
     }
 
     /**
-     * Add friendship metadata
+     * Add friendship metadata (placeholder for future use)
+     *
+     * Note: BuddyPress core doesn't support friendship metadata.
+     * This method is kept for potential future implementation
+     * if a custom friendship meta table is added.
      *
      * @since 1.0.0
      * @param int $friendship_id Friendship ID
@@ -265,20 +281,14 @@ class BP_Playground_Friends_Module extends BP_Playground_Abstract_Module {
      * @return void
      */
     private function add_friendship_meta($friendship_id, $initiator_id, $friend_id) {
-        // Add playground identification
-        bp_friends_update_meta($friendship_id, 'bp_playground_created', time());
+        // BuddyPress doesn't have a friendship meta API
+        // If needed in the future, we could:
+        // 1. Use user meta to track friendship data
+        // 2. Create a custom table for friendship metadata
+        // 3. Use the activity stream to track friendship context
         
-        // Add connection context (how they might have met)
-        $connection_contexts = [
-            'mutual_friends', 'shared_group', 'similar_interests', 
-            'professional_network', 'community_event', 'online_interaction'
-        ];
-        $context = $connection_contexts[array_rand($connection_contexts)];
-        bp_friends_update_meta($friendship_id, 'bp_playground_connection_context', $context);
-
-        // Add interaction score (simulated)
-        $interaction_score = mt_rand(1, 100);
-        bp_friends_update_meta($friendship_id, 'bp_playground_interaction_score', $interaction_score);
+        // For now, we'll just return without doing anything
+        return;
     }
 
     /**
@@ -504,7 +514,6 @@ class BP_Playground_Friends_Module extends BP_Playground_Abstract_Module {
             if ($user1 !== $user2 && !friends_check_friendship($user1, $user2)) {
                 $friendship_id = friends_add_friend($user1, $user2, true);
                 if ($friendship_id) {
-                    $this->add_friendship_meta($friendship_id, $user1, $user2);
                     $this->set_friendship_timestamps($friendship_id, false);
                     $connections_created++;
                 }
@@ -570,9 +579,14 @@ class BP_Playground_Friends_Module extends BP_Playground_Abstract_Module {
         // Pending friendships
         $stats['pending_friendships'] = $stats['total_friendships'] - $stats['confirmed_friendships'];
 
-        // Playground friendships
-        $stats['playground_friendships'] = $wpdb->get_var(
-            "SELECT COUNT(*) FROM {$wpdb->base_prefix}bp_friends_meta WHERE meta_key = 'bp_playground_created'"
+        // Note: Can't track playground-specific friendships without meta support
+        // We'll estimate based on recent friendships instead
+        $recent_date = date('Y-m-d H:i:s', strtotime('-30 days'));
+        $stats['recent_friendships'] = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT COUNT(*) FROM {$wpdb->base_prefix}bp_friends WHERE date_created > %s",
+                $recent_date
+            )
         );
 
         // Calculate network density and average friends per user
@@ -646,12 +660,13 @@ class BP_Playground_Friends_Module extends BP_Playground_Abstract_Module {
             return $results;
         }
 
-        // Build query for playground friendships
+        // Build query for friendships
+        // Note: Since we can't track playground-created friendships via meta,
+        // we'll need to be careful and only clean up friendships based on date
         $friendship_query = "
-            SELECT f.id, f.is_confirmed 
+            SELECT f.id, f.is_confirmed, f.date_created
             FROM {$wpdb->base_prefix}bp_friends f 
-            INNER JOIN {$wpdb->base_prefix}bp_friends_meta fm ON f.id = fm.friend_id 
-            WHERE fm.meta_key = 'bp_playground_created'
+            WHERE 1=1
         ";
 
         // Add filters
@@ -660,8 +675,13 @@ class BP_Playground_Friends_Module extends BP_Playground_Abstract_Module {
         }
 
         if ($options['older_than_days'] > 0) {
-            $timestamp = time() - ($options['older_than_days'] * 24 * 3600);
-            $friendship_query .= $wpdb->prepare(" AND fm.meta_value < %d", $timestamp);
+            $date_threshold = date('Y-m-d H:i:s', time() - ($options['older_than_days'] * 24 * 3600));
+            $friendship_query .= $wpdb->prepare(" AND f.date_created < %s", $date_threshold);
+        } else {
+            // For safety, if no date filter is specified, we'll skip cleanup
+            // to avoid accidentally removing all friendships
+            $this->log_warning('No date filter specified for friendship cleanup. Skipping to prevent data loss.');
+            return $results;
         }
 
         $friendships_to_remove = $wpdb->get_results($friendship_query);
@@ -680,11 +700,7 @@ class BP_Playground_Friends_Module extends BP_Playground_Abstract_Module {
                 }
             }
 
-            // Clean up any remaining meta
-            $meta_cleaned = $wpdb->query(
-                "DELETE FROM {$wpdb->base_prefix}bp_friends_meta WHERE meta_key LIKE 'bp_playground_%'"
-            );
-            $results['meta_cleaned'] = $meta_cleaned;
+            // Note: No friendship meta to clean up in BuddyPress core
         } else {
             foreach ($friendships_to_remove as $friendship) {
                 $results['friendships_removed']++;
@@ -732,10 +748,8 @@ class BP_Playground_Friends_Module extends BP_Playground_Abstract_Module {
 
         $where_clauses = [];
 
-        if ($options['playground_only']) {
-            $query .= " INNER JOIN {$wpdb->base_prefix}bp_friends_meta fm ON f.id = fm.friend_id";
-            $where_clauses[] = "fm.meta_key = 'bp_playground_created'";
-        }
+        // Note: Can't filter by playground-only without friendship meta
+        // We'll include all friendships or filter by date if needed
 
         if (!$options['include_pending']) {
             $where_clauses[] = "f.is_confirmed = 1";

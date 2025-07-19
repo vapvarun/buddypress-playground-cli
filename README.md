@@ -586,3 +586,5 @@ For support, please:
 - Added sample data library with 200+ real names and diverse content
 - Realistic group name generation with 100+ templates
 - Improved content variety for activities and user bios
+- Fixed XProfile field options creation for select, radio, checkbox, and multiselect fields
+- Fixed field creation parameter compatibility with BuddyPress

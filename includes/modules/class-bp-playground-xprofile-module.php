@@ -360,7 +360,7 @@ class BP_Playground_XProfile_Module extends BP_Playground_Abstract_Module {
             $field_config = $this->field_types[$field_type];
 
             $field_args = [
-                'field_group_id' => $group_id,
+                'field_group_id' => $group_id,  // This is correct for xprofile_insert_field
                 'name' => $field_name,
                 'type' => $field_type,
                 'is_required' => $this->is_field_required($field_name),
@@ -369,24 +369,16 @@ class BP_Playground_XProfile_Module extends BP_Playground_Abstract_Module {
                 'allow_custom_visibility' => $field_config['allow_custom_visibility'],
             ];
 
-            // Add options for select fields
-            if (in_array($field_type, ['selectbox', 'multiselectbox', 'radio', 'checkbox'])) {
-                if (isset($field_config['options'][$field_name])) {
-                    $field_args['type_obj'] = new stdClass();
-                    $field_args['type_obj']->options = $field_config['options'][$field_name];
-                }
-            }
-
             $field_id = xprofile_insert_field($field_args);
 
             if ($field_id) {
                 $created_fields++;
                 
-                // Set field options for choice-based fields
+                // Add options for select fields after creating the field
                 if (in_array($field_type, ['selectbox', 'multiselectbox', 'radio', 'checkbox'])) {
                     $this->set_field_options($field_id, $field_name, $field_type);
                 }
-
+                
                 $this->log("Created XProfile field: {$field_name} ({$field_type}) in group {$group_id}");
             } else {
                 $this->log_error("Failed to create XProfile field: {$field_name} in group {$group_id}");
@@ -415,21 +407,37 @@ class BP_Playground_XProfile_Module extends BP_Playground_Abstract_Module {
             return;
         }
 
+        // Get the parent field to get its group_id
+        $parent_field = new BP_XProfile_Field($field_id);
+        if (!$parent_field->id) {
+            $this->log_error("Parent field {$field_id} not found for options");
+            return;
+        }
+
         $options = $field_config['options'][$field_name];
         $option_order = 1;
 
-        foreach ($options as $option) {
-            $option_id = xprofile_insert_field([
-                'field_group_id' => 0, // 0 for field options
+        foreach ($options as $index => $option) {
+            $option_args = [
+                'field_group_id' => $parent_field->group_id, // Use parent field's group_id
                 'parent_id' => $field_id,
                 'name' => $option,
                 'type' => 'option',
-                'field_order' => $option_order++,
+                'option_order' => $option_order++, // Use option_order instead of field_order
                 'can_delete' => true,
-            ]);
+            ];
+            
+            // Only set is_default_option if it's the first option
+            if ($index === 0) {
+                $option_args['is_default_option'] = true;
+            }
+            
+            $option_id = xprofile_insert_field($option_args);
 
             if (!$option_id) {
                 $this->log_error("Failed to create option '{$option}' for field {$field_id}");
+            } else {
+                $this->log("Created option '{$option}' for field {$field_id}");
             }
         }
     }

@@ -452,25 +452,36 @@ class BP_Playground_Groups_Module extends BP_Playground_Abstract_Module {
      * @return void
      */
     private function add_group_members($group_id, $group_data, $user_ids, $creator_id) {
-        // Calculate member count based on group type and some randomness
-        $base_member_count = $group_data['average_members'];
-        $variation = mt_rand(-20, 30); // -20% to +30% variation
-        $member_count = max(5, $base_member_count + round($base_member_count * ($variation / 100)));
-        
-        // Don't exceed available users
-        $member_count = min($member_count, count($user_ids) - 1); // -1 for creator
-
-        // Remove creator from potential members
+        // Remove creator from potential members first
         $potential_members = array_diff($user_ids, [$creator_id]);
         
         if (empty($potential_members)) {
             return;
         }
 
+        // Calculate member count based on group type and some randomness
+        $base_member_count = $group_data['average_members'];
+        $variation = mt_rand(-20, 30); // -20% to +30% variation
+        $desired_member_count = max(1, $base_member_count + round($base_member_count * ($variation / 100)));
+        
+        // Don't exceed available potential members
+        $member_count = min($desired_member_count, count($potential_members));
+
         // Select random members
-        $selected_members = array_rand(array_flip($potential_members), min($member_count, count($potential_members)));
-        if (!is_array($selected_members)) {
-            $selected_members = [$selected_members];
+        $num_to_select = $member_count;
+        
+        // Handle edge case where we only have 1 potential member
+        if ($num_to_select <= 0) {
+            return;
+        }
+        
+        if ($num_to_select == 1) {
+            $selected_members = [$potential_members[0]];
+        } else {
+            $selected_members = array_rand(array_flip($potential_members), $num_to_select);
+            if (!is_array($selected_members)) {
+                $selected_members = [$selected_members];
+            }
         }
 
         // Add members with different roles
