@@ -426,6 +426,17 @@ class BP_Playground_Activities_Module extends BP_Playground_Abstract_Module {
      * @return array Engagement results
      */
     private function add_activity_engagement($options, $user_ids) {
+        // Ensure options have defaults
+        $defaults = [
+            'with_mentions' => true,
+            'with_comments' => true,
+            'with_favorites' => true,
+            'mention_rate' => 0.1,
+            'comment_rate' => 0.25,
+            'favorite_rate' => 0.15,
+        ];
+        $options = wp_parse_args($options, $defaults);
+        
         $results = [
             'comments_created' => 0,
             'favorites_created' => 0,
@@ -533,6 +544,17 @@ class BP_Playground_Activities_Module extends BP_Playground_Abstract_Module {
      * @return string Generated content
      */
     private function generate_activity_content($activity_type, $user_id, $group_ids, $options) {
+        // Ensure options have defaults
+        $defaults = [
+            'with_mentions' => true,
+            'with_comments' => true,
+            'with_favorites' => true,
+            'mention_rate' => 0.1,
+            'comment_rate' => 0.25,
+            'favorite_rate' => 0.15,
+        ];
+        $options = wp_parse_args($options, $defaults);
+        
         $type_config = $this->activity_types[$activity_type];
         
         if (count($type_config['templates']) === 1 && $type_config['templates'][0] === 'Welcome to the community!') {

@@ -6,6 +6,16 @@ A comprehensive WordPress plugin for generating realistic BuddyPress and bbPress
 **Website:** [Wbcom Designs](https://wbcomdesigns.com)  
 **GitHub:** [wbcomdesigns/buddypress-playground](https://github.com/wbcomdesigns/buddypress-playground)
 
+## TL;DR - Just Get Me Started!
+
+```bash
+# Install plugin, activate it, then run:
+wp bp playground scenario small-community
+
+# That's it! You now have a complete BuddyPress community with:
+# 500 users, profiles, groups, activities, messages, and friendships
+```
+
 ## Features
 
 - **Comprehensive Data Generation**: Create users, groups, activities, messages, forums, and more
@@ -37,40 +47,100 @@ A comprehensive WordPress plugin for generating realistic BuddyPress and bbPress
 
 ## Quick Start
 
-### Generate a Complete Testing Environment
+### Most Common Command - Generate Small Community
 
 ```bash
-# Generate medium-scale community data
-wp bp playground generate-all
-
-# Generate small community for quick testing
-wp bp playground generate-all --scale=small
-
-# Generate large dataset for performance testing
-wp bp playground generate-all --scale=large --users=10000 --groups=500
+# Generate a complete small community with all components (Recommended)
+wp bp playground scenario small-community
 ```
 
-### Use Predefined Scenarios
+This creates:
+- 500 users with complete XProfile data
+- 25 groups with realistic membership
+- 10,000 activities with comments and favorites
+- Friend connections
+- Private messages
+- All profile field types
+
+### Other Useful Scenarios
 
 ```bash
-# Perfect for addon development
+# Perfect for addon development and testing
 wp bp playground scenario addon-testing
 
-# Small community setup
-wp bp playground scenario small-community
-
-# Medium community with balanced data
+# Medium community with balanced data (2K users, 100 groups, 50K activities)
 wp bp playground scenario medium-community
 
-# Large community for stress testing
+# Large community for stress testing (10K users, 500 groups, 200K activities)
 wp bp playground scenario large-community
+```
+
+### Custom Generation Options
+
+```bash
+# Generate with specific parameters
+wp bp playground generate_all --scale=small
+
+# Generate with custom counts
+wp bp playground generate_all --users=1000 --groups=50 --activities=25000
+
+# Preview what will be generated
+wp bp playground generate_all --scale=small --dry-run
+```
+
+## Common Usage Patterns
+
+### For BuddyPress Addon Development
+
+```bash
+# 1. Start with a small community that has everything
+wp bp playground scenario small-community
+
+# 2. Add more specific data as needed
+wp bp playground activities --count=1000 --with-mentions --with-comments
+wp bp playground groups --count=10 --types=private
+```
+
+### For Testing XProfile Fields
+
+```bash
+# Create just XProfile fields and a few users
+wp bp playground users --count=20 --with-xprofile
+
+# The above command will:
+# - Create 6 field groups with various field types if they don't exist
+# - Create 20 users with populated profiles
+# - Skip existing profile data (won't overwrite)
+```
+
+### For Performance Testing
+
+```bash
+# Start with medium scale
+wp bp playground scenario medium-community
+
+# Then add more activities for stress testing
+wp bp playground activities --count=50000 --with-comments
+```
+
+### Quick Cleanup After Testing
+
+```bash
+# See what would be cleaned
+wp bp playground cleanup --dry-run
+
+# Clean everything
+wp bp playground cleanup --force
+
+# Clean only old data
+wp bp playground cleanup --older-than=7
 ```
 
 ## Command Reference
 
 ### Main Commands
 
-#### `wp bp playground generate-all`
+#### `wp bp playground generate_all`
 
 Generate comprehensive BuddyPress test data.
 
@@ -87,13 +157,13 @@ Generate comprehensive BuddyPress test data.
 **Examples:**
 ```bash
 # Basic medium-scale generation
-wp bp playground generate-all
+wp bp playground generate_all
 
 # Large-scale with custom parameters
-wp bp playground generate-all --scale=large --users=15000 --groups=750
+wp bp playground generate_all --scale=large --users=15000 --groups=750
 
 # Preview generation plan
-wp bp playground generate-all --dry-run
+wp bp playground generate_all --dry-run
 ```
 
 #### `wp bp playground scenario <scenario-name>`
@@ -127,18 +197,23 @@ Generate users with realistic profiles.
 
 **Options:**
 - `--count=<number>`: Number of users to create (default: 1000)
-- `--with-avatar`: Generate avatar placeholders
-- `--with-cover-image`: Generate cover image placeholders
+- `--with-xprofile`: Generate extended profile fields and populate them
+- `--member-types`: Create member types
 - `--activation-rate=<rate>`: Percentage of users to activate (0.0-1.0)
 - `--admin-rate=<rate>`: Percentage of users to make admins (0.0-0.1)
 
 ```bash
-# Generate 500 users with avatars
-wp bp playground users --count=500 --with-avatar
+# Generate users with complete profiles (creates XProfile fields if needed)
+wp bp playground users --count=100 --with-xprofile
 
 # Generate users with 90% activation rate
 wp bp playground users --count=1000 --activation-rate=0.9
 ```
+
+**Note on XProfile:** When using `--with-xprofile`:
+- If XProfile fields don't exist, they will be created automatically
+- Existing profile data is preserved (only empty fields are populated)
+- All field types are demonstrated (text, date, select, radio, checkbox, etc.)
 
 #### `wp bp playground groups`
 
@@ -165,15 +240,19 @@ Generate activity stream data.
 **Options:**
 - `--count=<number>`: Number of activities to create
 - `--with-mentions`: Include @mentions in activities
-- `--favorite-rate=<rate>`: Percentage of activities to favorite
-- `--comment-rate=<rate>`: Percentage of activities to comment on
+- `--with-comments`: Generate comments on activities
+- `--favorite-rate=<rate>`: Percentage of activities to favorite (0.0-1.0)
+- `--comment-rate=<rate>`: Percentage of activities to comment on (0.0-1.0)
 
 ```bash
 # Generate 25,000 activities with mentions
 wp bp playground activities --count=25000 --with-mentions
 
+# Generate activities with comments
+wp bp playground activities --count=10000 --with-comments
+
 # Generate activities with high engagement
-wp bp playground activities --count=10000 --favorite-rate=0.2 --comment-rate=0.3
+wp bp playground activities --count=10000 --with-comments --favorite-rate=0.2 --comment-rate=0.3
 ```
 
 ### Information Commands
@@ -212,13 +291,13 @@ wp bp playground stats --detailed
 wp bp playground stats --format=json
 ```
 
-#### `wp bp playground list-scenarios`
+#### `wp bp playground list_scenarios`
 
 List all available scenarios with descriptions.
 
 ```bash
 # View available scenarios
-wp bp playground list-scenarios
+wp bp playground list_scenarios
 ```
 
 ### Maintenance Commands
@@ -361,6 +440,7 @@ The plugin generates users based on realistic personas:
 - **Cascade Operations**: Proper cleanup of dependent data
 - **Validation**: Input validation and error handling
 - **Performance**: Optimized queries and batch processing
+- **Profile Data Protection**: Existing XProfile data is preserved - only empty fields are populated
 
 ## Performance Considerations
 
@@ -461,8 +541,8 @@ Review logs for issues:
 # View recent logs
 wp option get bp_playground_settings
 
-# Export logs for analysis
-wp bp playground export-logs --since=yesterday
+# Check plugin settings
+wp option get bp_playground_settings
 ```
 
 ## Contributing

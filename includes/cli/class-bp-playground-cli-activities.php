@@ -57,8 +57,8 @@ class BP_Playground_CLI_Activities extends WP_CLI_Command {
      */
     public function __invoke($args, $assoc_args) {
         $count = WP_CLI\Utils\get_flag_value($assoc_args, 'count', 10000);
-        $with_mentions = WP_CLI\Utils\get_flag_value($assoc_args, 'with-mentions', false);
-        $with_comments = WP_CLI\Utils\get_flag_value($assoc_args, 'with-comments', true);
+        $with_mentions = isset($assoc_args['with-mentions']) ? true : false;
+        $with_comments = isset($assoc_args['with-comments']) ? true : false;
         $favorite_rate = WP_CLI\Utils\get_flag_value($assoc_args, 'favorite-rate', 0.15);
         $comment_rate = WP_CLI\Utils\get_flag_value($assoc_args, 'comment-rate', 0.25);
 
@@ -73,6 +73,7 @@ class BP_Playground_CLI_Activities extends WP_CLI_Command {
             'count' => $count,
             'with_mentions' => $with_mentions,
             'with_comments' => $with_comments,
+            'with_favorites' => true,
             'favorite_rate' => $favorite_rate,
             'comment_rate' => $comment_rate,
         ];

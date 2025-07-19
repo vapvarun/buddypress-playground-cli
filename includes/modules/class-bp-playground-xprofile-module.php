@@ -549,6 +549,13 @@ class BP_Playground_XProfile_Module extends BP_Playground_Abstract_Module {
                     continue;
                 }
 
+                // Check if field already has a value
+                $existing_value = xprofile_get_field_data($field->id, $user_id);
+                if (!empty($existing_value) && $existing_value !== '') {
+                    // Skip fields that already have values
+                    continue;
+                }
+
                 $field_value = $this->generate_field_value($field, $user_persona);
                 
                 if ($field_value !== null) {

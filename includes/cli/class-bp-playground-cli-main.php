@@ -774,6 +774,11 @@ class BP_Playground_CLI_Main extends WP_CLI_Command {
         
         $total_cleaned = 0;
         foreach ($results as $component => $count) {
+            // Skip non-component keys
+            if (in_array($component, ['start_time', 'end_time', 'duration', 'memory_peak', 'errors'])) {
+                continue;
+            }
+            
             if (is_numeric($count) && $count > 0) {
                 WP_CLI::line("  {$component}: {$count} items {$action}");
                 $total_cleaned += $count;

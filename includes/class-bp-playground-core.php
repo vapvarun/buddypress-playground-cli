@@ -404,7 +404,11 @@ class BP_Playground_Core {
         try {
             $cleanup = bp_playground_get_module('cleanup');
             if ($cleanup) {
-                $results = $cleanup->cleanup_orphaned_data($options);
+                if (isset($options['component']) && $options['component'] !== 'all') {
+                    $results = $cleanup->cleanup_component($options['component'], $options);
+                } else {
+                    $results = $cleanup->cleanup_all($options);
+                }
             }
         } catch (Exception $e) {
             $this->add_error('Cleanup failed: ' . $e->getMessage());
@@ -493,7 +497,7 @@ class BP_Playground_Core {
      * @param string $scenario_name Scenario name
      * @return array|WP_Error Scenario configuration or error
      */
-    private function get_scenario_config($scenario_name) {
+    public function get_scenario_config($scenario_name) {
         $scenarios = [
             'small-community' => [
                 // FIRST: XProfile fields (created before users)

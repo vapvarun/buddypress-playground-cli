@@ -177,6 +177,26 @@ class BP_Playground_Users_Module extends BP_Playground_Abstract_Module {
                 
                 $xprofile_module = bp_playground_get_module('xprofile');
                 if ($xprofile_module) {
+                    // Check if xprofile fields exist beyond the default Name field
+                    global $wpdb;
+                    $field_count = $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}bp_xprofile_fields WHERE id > 1");
+                    
+                    // If no custom fields exist, create them first
+                    if ($field_count < 5) {
+                        $this->log('Creating XProfile fields first...', 'info');
+                        $xprofile_result = $xprofile_module->generate([
+                            'field_groups' => 6,
+                            'fields_per_group' => 8,
+                            'member_types' => true,
+                            'populate_data' => false, // Don't populate yet
+                        ]);
+                        
+                        if (is_wp_error($xprofile_result)) {
+                            $this->log_error('Failed to create XProfile fields: ' . $xprofile_result->get_error_message());
+                        } else {
+                            $this->log("Created {$xprofile_result['fields_created']} XProfile fields", 'info');
+                        }
+                    }
                     // Get the user IDs we just created
                     global $wpdb;
                     $created_user_ids = $wpdb->get_col(
@@ -187,11 +207,16 @@ class BP_Playground_Users_Module extends BP_Playground_Abstract_Module {
                     );
     
                     if (!empty($created_user_ids)) {
+                        $this->log("Found " . count($created_user_ids) . " users to populate profiles for", 'info');
                         $populate_result = $xprofile_module->populate_profile_data($created_user_ids, 0.85);
                         if (!is_wp_error($populate_result)) {
                             $results['users_with_profiles'] = $populate_result;
                             $this->log("Populated XProfile data for {$populate_result} users", 'info');
+                        } else {
+                            $this->log_error("Failed to populate profiles: " . $populate_result->get_error_message());
                         }
+                    } else {
+                        $this->log_error("No user IDs found to populate profiles");
                     }
                 }
             }

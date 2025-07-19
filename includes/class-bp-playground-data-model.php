@@ -314,12 +314,15 @@ class BP_Playground_Data_Model {
                 $engagement_count = round(count($user_ids) * $engagement_rate);
                 
                 // Select random users for engagement
-                $engaging_users = array_rand(array_flip($user_ids), min($engagement_count, count($user_ids)));
-                if (!is_array($engaging_users)) {
-                    $engaging_users = [$engaging_users];
+                if ($engagement_count > 0) {
+                    $engaging_users = array_rand(array_flip($user_ids), min($engagement_count, count($user_ids)));
+                    if (!is_array($engaging_users)) {
+                        $engaging_users = [$engaging_users];
+                    }
+                    $engagement_patterns[$content_id] = $engaging_users;
+                } else {
+                    $engagement_patterns[$content_id] = [];
                 }
-                
-                $engagement_patterns[$content_id] = $engaging_users;
             }
         }
 
