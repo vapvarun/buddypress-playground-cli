@@ -659,26 +659,57 @@ class BP_Playground_XProfile_Module extends BP_Playground_Abstract_Module {
                 return $persona['member_type'];
         }
 
-        // Handle by field type
+        // Map field names to sample data types
+        $field_type_mapping = [
+            'about' => 'about',
+            'bio' => 'bio',
+            'interests' => 'interests',
+            'skills' => 'skills',
+            'location' => 'location',
+            'website' => 'website',
+            'languages' => 'languages',
+            'education' => 'education',
+        ];
+        
+        // Check if field name maps to a sample data type
+        $normalized_name = strtolower($field_name);
+        foreach ($field_type_mapping as $key => $data_type) {
+            if (strpos($normalized_name, $key) !== false) {
+                $options = [
+                    'type' => $field_type,
+                    'name' => $field_name,
+                ];
+                
+                // Get field options if selectbox/radio/checkbox
+                if (in_array($field_type, ['selectbox', 'radio', 'multiselectbox', 'checkbox'])) {
+                    $options['options'] = $this->get_field_options($field);
+                }
+                
+                return BP_Playground_Sample_Data::generate_profile_field_value($data_type, $options);
+            }
+        }
+
+        // Handle by field type with sample data
         switch ($field_type) {
             case 'textbox':
-                return $this->generate_textbox_value($field_name, $persona);
             case 'textarea':
-                return $this->generate_textarea_value($field_name, $persona);
+                return BP_Playground_Sample_Data::generate_profile_field_value('about', ['type' => $field_type]);
             case 'selectbox':
             case 'radio':
-                return $this->get_random_field_option($field);
+                $options = $this->get_field_options($field);
+                return BP_Playground_Sample_Data::generate_profile_field_value($field_type, ['options' => $options, 'type' => $field_type]);
             case 'multiselectbox':
             case 'checkbox':
-                return $this->get_random_field_options($field, rand(1, 3));
+                $options = $this->get_field_options($field);
+                return BP_Playground_Sample_Data::generate_profile_field_value($field_type, ['options' => $options, 'type' => $field_type]);
             case 'datebox':
-                return $this->generate_date_value($field_name);
+                return BP_Playground_Sample_Data::generate_profile_field_value('datebox', []);
             case 'number':
-                return $this->generate_number_value($field_name);
+                return BP_Playground_Sample_Data::generate_profile_field_value('number', []);
             case 'url':
-                return $this->generate_url_value($field_name, $persona);
+                return BP_Playground_Sample_Data::generate_profile_field_value('url', []);
             default:
-                return null;
+                return BP_Playground_Sample_Data::generate_profile_field_value($field_type, ['name' => $field_name]);
         }
     }
 
@@ -895,10 +926,7 @@ class BP_Playground_XProfile_Module extends BP_Playground_Abstract_Module {
      * @return string Random first name
      */
     private function generate_first_name() {
-        $names = [
-            'Alex', 'Jordan', 'Taylor', 'Morgan', 'Casey', 'Riley', 'Avery', 'Quinn',
-            'Jamie', 'Sage', 'River', 'Skylar', 'Phoenix', 'Rowan', 'Blake', 'Drew'
-        ];
+        $names = BP_Playground_Sample_Data::get_first_names('all');
         return $names[array_rand($names)];
     }
 
@@ -909,10 +937,7 @@ class BP_Playground_XProfile_Module extends BP_Playground_Abstract_Module {
      * @return string Random last name
      */
     private function generate_last_name() {
-        $names = [
-            'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis',
-            'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzales', 'Wilson', 'Anderson', 'Thomas'
-        ];
+        $names = BP_Playground_Sample_Data::get_last_names('all');
         return $names[array_rand($names)];
     }
 

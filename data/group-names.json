@@ -1,0 +1,62 @@
+{
+    "prefixes": [
+        "Community", "Local", "City", "Urban", "Downtown", "Neighborhood", "Regional", "Metro", "Central", "North",
+        "South", "East", "West", "Greater", "New", "Modern", "Digital", "Creative", "Active", "United",
+        "Collaborative", "Open", "Free", "Public", "Civic", "Social", "Green", "Sustainable", "Future", "Next"
+    ],
+    "categories": {
+        "sports_fitness": [
+            "Runners Club", "Cycling Group", "Yoga Collective", "Fitness Friends", "Basketball League", "Soccer Team",
+            "Tennis Partners", "Swimming Club", "Hiking Enthusiasts", "Rock Climbing Crew", "Martial Arts Dojo",
+            "Dance Studio", "Walking Group", "Triathlon Training", "Golf Society", "Volleyball Network", "Boxing Gym",
+            "Pilates Studio", "CrossFit Box", "Outdoor Adventures"
+        ],
+        "arts_culture": [
+            "Artists Collective", "Photography Club", "Book Club", "Writers Circle", "Music Makers", "Theater Group",
+            "Film Society", "Poetry Corner", "Art Gallery", "Creative Workshop", "Crafters Guild", "Makers Space",
+            "Design Studio", "Cultural Center", "Heritage Society", "Museum Friends", "Jazz Appreciation", "Classical Music Society",
+            "Street Art Collective", "Digital Arts Lab"
+        ],
+        "professional": [
+            "Entrepreneurs Network", "Freelancers Hub", "Tech Meetup", "Business Leaders", "Startup Incubator", "Marketing Professionals",
+            "Developers Group", "Design Thinking", "Innovation Lab", "Coworking Space", "Career Development", "Leadership Forum",
+            "Women in Business", "Young Professionals", "Mentorship Program", "Industry Alliance", "Trade Association", "Chamber of Commerce",
+            "Rotary Club", "Networking Group"
+        ],
+        "education": [
+            "Study Group", "Language Exchange", "Coding Bootcamp", "Science Club", "Math Circle", "History Buffs",
+            "Philosophy Forum", "Debate Society", "Research Collective", "Academic Alliance", "Learning Lab", "Tutorial Center",
+            "Homework Help", "Test Prep", "College Prep", "Adult Education", "Continuing Ed", "Skills Workshop",
+            "Knowledge Share", "Education Reform"
+        ],
+        "community_service": [
+            "Volunteer Corps", "Community Garden", "Food Bank", "Habitat Builders", "Environmental Action", "Beach Cleanup",
+            "Tree Planters", "Animal Shelter", "Senior Support", "Youth Mentors", "Literacy Program", "Homeless Outreach",
+            "Crisis Support", "Disaster Relief", "Blood Donors", "Charity Foundation", "Fundraising Committee", "Social Justice",
+            "Human Rights", "Peace Initiative"
+        ],
+        "social": [
+            "Coffee Lovers", "Happy Hour Group", "Game Night", "Trivia Team", "Karaoke Club", "Movie Buffs",
+            "Dining Club", "Wine Tasting", "Beer Enthusiasts", "Cooking Class", "Potluck Group", "Singles Meetup",
+            "Couples Connection", "Parents Group", "Empty Nesters", "Senior Social", "Young Adults", "Teen Hangout",
+            "Family Fun", "Playdate Group"
+        ],
+        "hobbies": [
+            "Gardening Club", "Chess Club", "Board Games", "Card Players", "Collectors Corner", "Model Builders",
+            "Drone Pilots", "Amateur Radio", "Astronomy Club", "Bird Watchers", "Nature Lovers", "Fishing Club",
+            "Hunting Group", "Camping Crew", "RV Travelers", "Motorcycle Riders", "Car Enthusiasts", "Boat Club",
+            "Aviation Society", "Train Spotters"
+        ],
+        "support": [
+            "Support Circle", "Recovery Group", "Wellness Center", "Mental Health", "Grief Support", "Caregivers Network",
+            "Chronic Illness", "Cancer Survivors", "Addiction Recovery", "Family Support", "Single Parents", "Divorce Support",
+            "Veterans Group", "Disability Alliance", "LGBTQ+ Center", "Women's Shelter", "Men's Group", "Youth Support",
+            "Elder Care", "Peer Support"
+        ]
+    },
+    "suffixes": [
+        "Alliance", "Association", "Circle", "Club", "Collective", "Community", "Connection", "Cooperative", "Council",
+        "Fellowship", "Forum", "Foundation", "Friends", "Group", "Guild", "Hub", "Initiative", "Institute", "League",
+        "Movement", "Network", "Organization", "Partnership", "Project", "Society", "Squad", "Team", "Union", "United"
+    ]
+}

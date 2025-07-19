@@ -44,58 +44,23 @@ class BP_Playground_Users_Module extends BP_Playground_Abstract_Module {
     private $user_personas = [
         'tech_professional' => [
             'weight' => 0.25,
-            'first_names' => ['Alex', 'Jordan', 'Sam', 'Taylor', 'Morgan', 'Casey', 'Riley'],
-            'last_names' => ['Smith', 'Johnson', 'Chen', 'Patel', 'Rodriguez', 'Kim', 'Anderson'],
             'domains' => ['techcorp.com', 'devstudio.com', 'codelab.io', 'innovate.tech'],
-            'bio_templates' => [
-                'Passionate software developer with {years} years of experience in {tech_stack}.',
-                'Full-stack developer specializing in {tech_stack} and modern web technologies.',
-                'Tech enthusiast and problem solver. Love building scalable applications.',
-            ],
         ],
         'creative_professional' => [
             'weight' => 0.20,
-            'first_names' => ['Luna', 'River', 'Sage', 'Phoenix', 'Quinn', 'Blake', 'Rowan'],
-            'last_names' => ['Williams', 'Brown', 'Davis', 'Miller', 'Wilson', 'Moore', 'Taylor'],
             'domains' => ['creative.agency', 'design.studio', 'artworks.com', 'visual.co'],
-            'bio_templates' => [
-                'Creative designer with a passion for visual storytelling and user experience.',
-                'Digital artist exploring the intersection of technology and creativity.',
-                'Brand strategist helping businesses tell their stories through design.',
-            ],
         ],
         'business_professional' => [
             'weight' => 0.20,
-            'first_names' => ['Michael', 'Sarah', 'David', 'Jennifer', 'Robert', 'Lisa', 'James'],
-            'last_names' => ['Garcia', 'Martinez', 'Lopez', 'Gonzalez', 'Hernandez', 'Young', 'King'],
             'domains' => ['bizgroup.com', 'consulting.pro', 'strategy.co', 'corporate.net'],
-            'bio_templates' => [
-                'Business strategist with expertise in market analysis and growth planning.',
-                'Project manager passionate about delivering results and building teams.',
-                'Entrepreneur focused on innovation and sustainable business practices.',
-            ],
         ],
         'educator' => [
             'weight' => 0.15,
-            'first_names' => ['Emma', 'William', 'Olivia', 'Benjamin', 'Sophia', 'Daniel', 'Isabella'],
-            'last_names' => ['Lee', 'Walker', 'Hall', 'Allen', 'Wright', 'Scott', 'Green'],
             'domains' => ['university.edu', 'school.org', 'learning.edu', 'academy.edu'],
-            'bio_templates' => [
-                'Educator passionate about fostering learning and inspiring students.',
-                'Academic researcher focused on {subject} and innovative teaching methods.',
-                'Lifelong learner dedicated to making education accessible and engaging.',
-            ],
         ],
         'student' => [
             'weight' => 0.20,
-            'first_names' => ['Ethan', 'Ava', 'Noah', 'Mia', 'Lucas', 'Charlotte', 'Oliver'],
-            'last_names' => ['Adams', 'Baker', 'Clark', 'Evans', 'Fisher', 'Gray', 'Hill'],
             'domains' => ['student.edu', 'university.edu', 'college.edu', 'academy.org'],
-            'bio_templates' => [
-                'Student pursuing {degree} with interests in {interests}.',
-                'Passionate learner exploring {field} and looking for opportunities to grow.',
-                'Future {profession} currently studying and building practical skills.',
-            ],
         ],
     ];
 
@@ -293,9 +258,12 @@ class BP_Playground_Users_Module extends BP_Playground_Abstract_Module {
         $persona_key = $this->select_persona();
         $persona = $this->user_personas[$persona_key];
 
-        // Generate basic user data
-        $first_name = $persona['first_names'][array_rand($persona['first_names'])];
-        $last_name = $persona['last_names'][array_rand($persona['last_names'])];
+        // Generate basic user data using sample data
+        $first_names = BP_Playground_Sample_Data::get_first_names('all');
+        $last_names = BP_Playground_Sample_Data::get_last_names('all');
+        
+        $first_name = $first_names[array_rand($first_names)];
+        $last_name = $last_names[array_rand($last_names)];
         $username = $this->generate_username($first_name, $last_name, $user_index);
         $email = $this->generate_email($username, $persona['domains']);
 
@@ -304,8 +272,8 @@ class BP_Playground_Users_Module extends BP_Playground_Abstract_Module {
         $is_admin = (mt_rand() / mt_getrandmax()) < $admin_rate;
         $role = $is_admin ? 'administrator' : 'subscriber';
 
-        // Generate bio
-        $bio = $this->generate_bio($persona, $first_name);
+        // Generate bio using sample data
+        $bio = BP_Playground_Sample_Data::generate_bio($persona_key);
 
         // Determine activation status - with proper array key check
         $activation_rate = isset($options['activation_rate']) ? $options['activation_rate'] : 0.95;
@@ -548,168 +516,6 @@ class BP_Playground_Users_Module extends BP_Playground_Abstract_Module {
         return $email;
     }
 
-    /**
-     * Generate bio based on persona
-     *
-     * @since 1.0.0
-     * @param array $persona Persona data
-     * @param string $first_name User's first name
-     * @return string Generated bio
-     */
-    private function generate_bio($persona, $first_name) {
-        $template = $persona['bio_templates'][array_rand($persona['bio_templates'])];
-        
-        // Replace placeholders
-        $replacements = [
-            '{years}' => rand(2, 15),
-            '{tech_stack}' => $this->get_random_tech_stack(),
-            '{subject}' => $this->get_random_subject(),
-            '{interests}' => $this->get_random_interests(),
-            '{degree}' => $this->get_random_degree(),
-            '{field}' => $this->get_random_field(),
-            '{profession}' => $this->get_random_profession(),
-        ];
-
-        $bio = str_replace(array_keys($replacements), array_values($replacements), $template);
-        
-        return $bio;
-    }
-
-    /**
-     * Get random tech stack
-     *
-     * @since 1.0.0
-     * @return string Random tech stack
-     */
-    private function get_random_tech_stack() {
-        $stacks = [
-            'PHP and WordPress',
-            'JavaScript and React',
-            'Python and Django',
-            'Node.js and Express',
-            'Java and Spring',
-            'C# and .NET',
-            'Ruby on Rails',
-            'Vue.js and Laravel',
-        ];
-
-        return $stacks[array_rand($stacks)];
-    }
-
-    /**
-     * Get random academic subject
-     *
-     * @since 1.0.0
-     * @return string Random subject
-     */
-    private function get_random_subject() {
-        $subjects = [
-            'Computer Science',
-            'Digital Marketing',
-            'Psychology',
-            'Business Administration',
-            'Data Science',
-            'Education Technology',
-            'Graphic Design',
-            'Project Management',
-        ];
-
-        return $subjects[array_rand($subjects)];
-    }
-
-    /**
-     * Get random interests
-     *
-     * @since 1.0.0
-     * @return string Random interests
-     */
-    private function get_random_interests() {
-        $interests = [
-            'technology and innovation',
-            'design and creativity',
-            'business and entrepreneurship',
-            'education and learning',
-            'travel and photography',
-            'music and arts',
-            'sports and fitness',
-            'reading and writing',
-        ];
-
-        $selected = array_rand($interests, rand(2, 3));
-        if (!is_array($selected)) {
-            $selected = [$selected];
-        }
-
-        $result = [];
-        foreach ($selected as $index) {
-            $result[] = $interests[$index];
-        }
-
-        return implode(', ', $result);
-    }
-
-    /**
-     * Get random degree
-     *
-     * @since 1.0.0
-     * @return string Random degree
-     */
-    private function get_random_degree() {
-        $degrees = [
-            'Computer Science',
-            'Business Administration',
-            'Marketing',
-            'Graphic Design',
-            'Psychology',
-            'Education',
-            'Engineering',
-            'Communications',
-        ];
-
-        return $degrees[array_rand($degrees)];
-    }
-
-    /**
-     * Get random field
-     *
-     * @since 1.0.0
-     * @return string Random field
-     */
-    private function get_random_field() {
-        $fields = [
-            'web development',
-            'digital marketing',
-            'user experience design',
-            'data analysis',
-            'project management',
-            'content creation',
-            'business strategy',
-            'education technology',
-        ];
-
-        return $fields[array_rand($fields)];
-    }
-
-    /**
-     * Get random profession
-     *
-     * @since 1.0.0
-     * @return string Random profession
-     */
-    private function get_random_profession() {
-        $professions = [
-            'software developer',
-            'digital marketer',
-            'UX designer',
-            'data scientist',
-            'project manager',
-            'content creator',
-            'business analyst',
-            'educator',
-        ];
-
-        return $professions[array_rand($professions)];
-    }
 
     /**
      * Maybe add avatar for user

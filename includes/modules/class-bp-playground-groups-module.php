@@ -321,16 +321,17 @@ class BP_Playground_Groups_Module extends BP_Playground_Abstract_Module {
         $group_type = $this->select_group_type(isset($options['types']) ? $options['types'] : 'mixed');
         $type_config = $this->group_types[$group_type];
 
-        // Select category and name
-        $category = array_rand($this->group_categories);
-        $category_data = $this->group_categories[$category];
-        $name = $category_data['names'][array_rand($category_data['names'])];
-        $description = $category_data['descriptions'][array_rand($category_data['descriptions'])];
-
-        // Add some variation to names to avoid duplicates
-        if (mt_rand(1, 10) > 7) {
-            $name .= ' ' . mt_rand(1, 999);
-        }
+        // Generate group name using sample data
+        $group_names_data = BP_Playground_Sample_Data::get_group_names();
+        $categories = array_keys($group_names_data['categories']);
+        $category = $categories[array_rand($categories)];
+        
+        // Generate name from sample data
+        $name = BP_Playground_Sample_Data::generate_group_name($category);
+        
+        // Generate appropriate description based on category
+        $descriptions = $this->get_category_descriptions($category);
+        $description = $descriptions[array_rand($descriptions)];
 
         // Generate slug
         $slug = sanitize_title($name . '-' . $group_index);
@@ -519,6 +520,65 @@ class BP_Playground_Groups_Module extends BP_Playground_Abstract_Module {
         if (!$actual_member_count) {
             groups_update_groupmeta($group_id, 'total_member_count', count($selected_members) + 1); // +1 for creator
         }
+    }
+
+    /**
+     * Get descriptions for a category
+     *
+     * @since 1.0.0
+     * @param string $category Category name
+     * @return array Array of descriptions
+     */
+    private function get_category_descriptions($category) {
+        $descriptions = [
+            'sports_fitness' => [
+                'Join us for regular activities and fitness challenges. All skill levels welcome!',
+                'A supportive community focused on health, wellness, and achieving fitness goals together.',
+                'Share your journey, find workout partners, and stay motivated with like-minded individuals.',
+            ],
+            'arts_culture' => [
+                'A creative space for artists to collaborate, share work, and find inspiration.',
+                'Exploring artistic expression and cultural experiences in our community.',
+                'Connect with fellow creatives, share techniques, and grow your artistic skills.',
+            ],
+            'professional' => [
+                'Networking and professional development for career growth and success.',
+                'Share insights, opportunities, and build meaningful professional connections.',
+                'Advancing careers through collaboration, mentorship, and knowledge sharing.',
+            ],
+            'education' => [
+                'Supporting lifelong learning through shared resources and experiences.',
+                'A collaborative learning environment for students and educators alike.',
+                'Expand your knowledge and help others on their educational journey.',
+            ],
+            'community_service' => [
+                'Making a positive impact in our community through volunteer work and activism.',
+                'Join us in creating meaningful change and supporting important causes.',
+                'Together we can make a difference in the lives of those who need it most.',
+            ],
+            'social' => [
+                'Building friendships and creating memorable experiences together.',
+                'A welcoming space for social connection and community building.',
+                'Meet new people, share experiences, and enjoy life together.',
+            ],
+            'hobbies' => [
+                'Pursue your passion with others who share your interests.',
+                'Learn, share, and enjoy your favorite hobby with enthusiastic community members.',
+                'From beginners to experts, everyone is welcome to join and participate.',
+            ],
+            'support' => [
+                'A safe, supportive space for sharing experiences and finding understanding.',
+                'Connect with others who understand your journey and can offer support.',
+                'Building strength through community, compassion, and shared experiences.',
+            ],
+        ];
+
+        // Return category descriptions or default ones
+        return $descriptions[$category] ?? [
+            'A community group focused on bringing people together.',
+            'Join us for activities, discussions, and community building.',
+            'Connect with others who share similar interests and goals.',
+        ];
     }
 
     /**

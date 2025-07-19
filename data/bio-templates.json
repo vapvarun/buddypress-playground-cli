@@ -1,0 +1,94 @@
+{
+    "templates": {
+        "tech_professional": [
+            "Passionate {role} with {years} years of experience in {specialty}. Love building {projects} that make a difference.",
+            "Full-stack developer specializing in {tech_stack}. Always learning, always coding. {hobby} enthusiast.",
+            "{role} by day, {hobby} by night. Building the future one line of code at a time.",
+            "Tech enthusiast and {role}. Focused on {specialty} and {interest}. Let's connect and build something amazing!",
+            "Software engineer passionate about {tech_stack} and {specialty}. When not coding, you'll find me {activity}."
+        ],
+        "creative_professional": [
+            "Creative {role} with a passion for {specialty}. Bringing ideas to life through {medium}.",
+            "{role} and storyteller. Specializing in {specialty} with {years} years of experience. {hobby} lover.",
+            "Visual artist exploring the intersection of {interest1} and {interest2}. Always seeking new inspiration.",
+            "Designer by profession, {hobby} by passion. Creating beautiful {projects} that inspire and engage.",
+            "{role} helping brands tell their stories. Expertise in {specialty} and {skill}."
+        ],
+        "business_professional": [
+            "{role} with {years} years in {industry}. Passionate about {specialty} and {interest}.",
+            "Business strategist focused on {specialty}. Helping companies achieve {goal}. {hobby} enthusiast.",
+            "Experienced {role} in {industry}. Specializing in {specialty} and team leadership.",
+            "{role} dedicated to {goal}. Expert in {specialty} with a love for {hobby}.",
+            "Entrepreneur and {role}. Building solutions in {industry}. Always up for {activity}."
+        ],
+        "educator": [
+            "{role} passionate about {subject}. {years} years inspiring students to {goal}.",
+            "Educator specializing in {subject}. Believer in {philosophy}. {hobby} in my free time.",
+            "Teaching {subject} and loving every moment. Focused on {specialty}. {interest} advocate.",
+            "{role} dedicated to making {subject} accessible and engaging. {hobby} enthusiast.",
+            "Academic professional in {subject}. Research interests include {specialty}. Love {activity}."
+        ],
+        "student": [
+            "{level} student studying {major}. Interested in {interest1} and {interest2}. {hobby} lover.",
+            "Pursuing {degree} in {major}. Passionate about {interest} and making a difference.",
+            "Student of {major} with dreams of becoming a {career}. {hobby} keeps me balanced.",
+            "Currently studying {major} at {level} level. Fascinated by {interest}. Always up for {activity}.",
+            "{level} {major} student. Building skills in {skill} and {specialty}. {hobby} enthusiast."
+        ],
+        "community_member": [
+            "Active community member passionate about {cause}. {hobby} enthusiast and {interest} advocate.",
+            "Local {role} dedicated to {goal}. Love {activity} and connecting with neighbors.",
+            "Community volunteer focused on {cause}. {years} years of {specialty}. {hobby} lover.",
+            "Proud resident and {role}. Working to make our community better through {initiative}.",
+            "{role} and {hobby} enthusiast. Believer in {philosophy} and community action."
+        ]
+    },
+    "variables": {
+        "role": [
+            "developer", "designer", "engineer", "architect", "consultant", "analyst", "manager", "director",
+            "coordinator", "specialist", "expert", "professional", "freelancer", "founder", "leader", "advocate",
+            "organizer", "facilitator", "mentor", "coach", "instructor", "teacher", "professor", "researcher"
+        ],
+        "years": ["2", "3", "5", "7", "10", "12", "15", "20"],
+        "specialty": [
+            "web development", "mobile apps", "cloud computing", "data science", "machine learning", "UX design",
+            "graphic design", "content creation", "digital marketing", "social media", "project management",
+            "business strategy", "financial planning", "human resources", "operations", "sales", "customer success",
+            "product development", "quality assurance", "technical writing"
+        ],
+        "tech_stack": [
+            "React and Node.js", "Python and Django", "Java and Spring", "PHP and Laravel", "Ruby on Rails",
+            "Vue.js and Express", "Angular and .NET", "Flutter and Firebase", "Swift and iOS", "Kotlin and Android"
+        ],
+        "hobby": [
+            "photography", "hiking", "cooking", "gaming", "reading", "traveling", "music", "fitness", "yoga",
+            "meditation", "gardening", "painting", "writing", "dancing", "cycling", "running", "swimming"
+        ],
+        "activity": [
+            "exploring new places", "trying new restaurants", "attending meetups", "learning new skills",
+            "volunteering", "mentoring others", "building projects", "creating content", "connecting with people"
+        ],
+        "interest": [
+            "innovation", "sustainability", "education", "technology", "creativity", "wellness", "community",
+            "entrepreneurship", "social impact", "environmental conservation", "arts and culture"
+        ],
+        "subject": [
+            "Mathematics", "Science", "History", "Literature", "Computer Science", "Business", "Psychology",
+            "Sociology", "Philosophy", "Art", "Music", "Physical Education", "Languages", "Economics"
+        ],
+        "major": [
+            "Computer Science", "Business Administration", "Psychology", "Engineering", "Communications",
+            "Biology", "Marketing", "Education", "Nursing", "Architecture", "Graphic Design", "Data Science"
+        ],
+        "degree": [
+            "Bachelor's", "Master's", "PhD", "Associate's", "Certificate", "Diploma"
+        ],
+        "level": [
+            "undergraduate", "graduate", "doctoral", "first-year", "second-year", "third-year", "final-year"
+        ],
+        "career": [
+            "software engineer", "data scientist", "teacher", "doctor", "entrepreneur", "designer", "consultant",
+            "researcher", "manager", "analyst", "developer", "architect", "counselor", "marketer"
+        ]
+    }
+}

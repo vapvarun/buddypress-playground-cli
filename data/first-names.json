@@ -1,0 +1,31 @@
+{
+    "male": [
+        "James", "John", "Robert", "Michael", "William", "David", "Richard", "Joseph", "Thomas", "Charles",
+        "Christopher", "Daniel", "Matthew", "Anthony", "Mark", "Donald", "Steven", "Kenneth", "Paul", "Joshua",
+        "Andrew", "Kevin", "Brian", "George", "Edward", "Ronald", "Timothy", "Jason", "Jeffrey", "Ryan",
+        "Jacob", "Gary", "Nicholas", "Eric", "Jonathan", "Stephen", "Larry", "Justin", "Scott", "Brandon",
+        "Benjamin", "Samuel", "Frank", "Gregory", "Raymond", "Alexander", "Patrick", "Jack", "Dennis", "Jerry",
+        "Tyler", "Aaron", "Jose", "Nathan", "Henry", "Zachary", "Douglas", "Peter", "Kyle", "Noah",
+        "Adam", "Walter", "Ethan", "Willie", "Austin", "Keith", "Albert", "Wayne", "Elijah", "Mason",
+        "Carlos", "Vincent", "Ralph", "Eugene", "Russell", "Louis", "Philip", "Johnny", "Bernard", "Carl",
+        "Arthur", "Terry", "Sean", "Gerald", "Lawrence", "Dylan", "Christian", "Jordan", "Billy", "Bruce",
+        "Logan", "Juan", "Gabriel", "Willie", "Albert", "Francisco", "Marcus", "Raymond", "Liam", "Oliver"
+    ],
+    "female": [
+        "Mary", "Patricia", "Jennifer", "Linda", "Elizabeth", "Barbara", "Susan", "Jessica", "Sarah", "Karen",
+        "Nancy", "Lisa", "Betty", "Dorothy", "Sandra", "Ashley", "Kimberly", "Emily", "Donna", "Michelle",
+        "Carol", "Amanda", "Melissa", "Deborah", "Stephanie", "Rebecca", "Laura", "Sharon", "Cynthia", "Kathleen",
+        "Amy", "Shirley", "Angela", "Helen", "Anna", "Brenda", "Pamela", "Nicole", "Samantha", "Katherine",
+        "Emma", "Ruth", "Christine", "Catherine", "Debra", "Rachel", "Carolyn", "Janet", "Virginia", "Maria",
+        "Heather", "Diane", "Julie", "Joyce", "Victoria", "Kelly", "Christina", "Lauren", "Joan", "Evelyn",
+        "Olivia", "Judith", "Megan", "Cheryl", "Martha", "Andrea", "Frances", "Hannah", "Jacqueline", "Ann",
+        "Gloria", "Jean", "Kathryn", "Alice", "Teresa", "Sara", "Janice", "Doris", "Madison", "Julia",
+        "Grace", "Judy", "Abigail", "Marie", "Denise", "Beverly", "Amber", "Theresa", "Marilyn", "Danielle",
+        "Diana", "Brittany", "Natalie", "Sophia", "Rose", "Isabella", "Alexis", "Kayla", "Charlotte", "Ava"
+    ],
+    "neutral": [
+        "Alex", "Jordan", "Taylor", "Morgan", "Casey", "Riley", "Jamie", "Avery", "Quinn", "Cameron",
+        "Skyler", "Drew", "Blake", "Parker", "Sage", "River", "Phoenix", "Rowan", "Finley", "Charlie",
+        "Emerson", "Hayden", "Reese", "Dakota", "Marley", "Remy", "Sawyer", "Peyton", "Bailey", "Kendall"
+    ]
+}

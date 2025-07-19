@@ -19,7 +19,8 @@ wp bp playground scenario small-community
 ## Features
 
 - **Comprehensive Data Generation**: Create users, groups, activities, messages, forums, and more
-- **Realistic Data Models**: Generate data that mimics real-world usage patterns
+- **Realistic Data Models**: Generate data that mimics real-world usage patterns with diverse sample data
+- **Sample Data Library**: Includes 200+ real names, 100+ group name templates, and varied content
 - **XProfile System**: Complete extended profile field generation with all field types
 - **Batch Processing**: Efficient handling of large datasets with memory management
 - **Multiple Scenarios**: Pre-configured scenarios for different testing needs
@@ -582,3 +583,6 @@ For support, please:
 - Security hardening for SQL queries
 - Fixed array handling issues
 - Production-ready error handling
+- Added sample data library with 200+ real names and diverse content
+- Realistic group name generation with 100+ templates
+- Improved content variety for activities and user bios

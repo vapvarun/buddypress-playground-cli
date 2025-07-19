@@ -396,13 +396,8 @@ class BP_Playground_Messages_Module extends BP_Playground_Abstract_Module {
         $messages_created = 0;
         $recipients_added = 0;
 
-        // Create initial message
-        $initial_content = $this->generate_message_content(
-            $thread_data['conversation_type'], 
-            'initial', 
-            $thread_data['sender_id'], 
-            $thread_data['recipients'][0]
-        );
+        // Create initial message using sample data
+        $initial_content = BP_Playground_Sample_Data::generate_single_message('starter');
 
         $thread_id = messages_new_message([
             'sender_id' => $thread_data['sender_id'],
@@ -429,13 +424,9 @@ class BP_Playground_Messages_Module extends BP_Playground_Abstract_Module {
             $current_sender = $thread_data['participants'][$current_sender_index % count($thread_data['participants'])];
             $current_sender_index++;
 
-            $message_type = $i === 1 ? 'response' : 'followup';
-            $message_content = $this->generate_message_content(
-                $thread_data['conversation_type'],
-                $message_type,
-                $current_sender,
-                $thread_data['sender_id']
-            );
+            // Use sample data for message content
+            $message_type = $i === 1 ? 'response' : 'follow_up';
+            $message_content = BP_Playground_Sample_Data::generate_single_message($message_type);
 
             $message_id = messages_new_message([
                 'sender_id' => $current_sender,

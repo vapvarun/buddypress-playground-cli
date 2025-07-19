@@ -561,19 +561,8 @@ class BP_Playground_Activities_Module extends BP_Playground_Abstract_Module {
             return ''; // No content for system activities
         }
 
-        // Get user persona for context
-        $user_persona = get_user_meta($user_id, 'bp_playground_persona', true);
-        $context = $this->get_content_context($user_persona);
-
-        // Select content template
-        if (isset($this->content_templates[$context])) {
-            $template = $this->content_templates[$context][array_rand($this->content_templates[$context])];
-        } else {
-            $template = $type_config['templates'][array_rand($type_config['templates'])];
-        }
-
-        // Replace placeholders
-        $content = $this->replace_content_placeholders($template, $context);
+        // Use sample data for content generation
+        $content = BP_Playground_Sample_Data::generate_activity_content($activity_type);
 
         // Add mentions if enabled
         if ($options['with_mentions'] && mt_rand(1, 100) <= ($options['mention_rate'] * 100)) {
@@ -582,6 +571,8 @@ class BP_Playground_Activities_Module extends BP_Playground_Abstract_Module {
 
         // Add hashtags occasionally
         if (mt_rand(1, 100) <= 30) { // 30% chance
+            $user_persona = get_user_meta($user_id, 'bp_playground_persona', true);
+            $context = $this->get_content_context($user_persona);
             $content = $this->add_hashtags_to_content($content, $context);
         }
 
@@ -918,25 +909,7 @@ class BP_Playground_Activities_Module extends BP_Playground_Abstract_Module {
      * @return string Comment content
      */
     private function generate_comment_content() {
-        $comment_templates = [
-            'Great post! Thanks for sharing.',
-            'I completely agree with this perspective.',
-            'This is really helpful, thank you!',
-            'Interesting point of view.',
-            'Thanks for the inspiration!',
-            'Love this! Keep up the great work.',
-            'Very insightful, learned something new.',
-            'Couldn\'t agree more!',
-            'This resonates with me.',
-            'Excellent point!',
-            'Well said! 👏',
-            'This is exactly what I needed to read today.',
-            'Great insights as always.',
-            'Thanks for sharing your experience.',
-            'Really appreciate this perspective.',
-        ];
-
-        return $comment_templates[array_rand($comment_templates)];
+        return BP_Playground_Sample_Data::generate_comment_content();
     }
 
     /**

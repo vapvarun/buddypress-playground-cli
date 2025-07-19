@@ -1,0 +1,98 @@
+{
+    "conversation_starters": [
+        "Hey! How's your {timeframe} going?",
+        "Hi there! I noticed you're interested in {interest}. I'd love to connect!",
+        "Hello! I saw your post about {topic} and found it really interesting.",
+        "Hi! We're in the same {group} group. Would love to chat!",
+        "Hey there! Your profile caught my eye - we seem to have similar interests in {interest}.",
+        "Hi! I'm reaching out to fellow {profession} professionals. How's your experience been?",
+        "Hello! I think we met at the {event} last week. How are you?",
+        "Hey! I'm new to the community and looking to connect with people interested in {interest}.",
+        "Hi! Your recent activity about {topic} resonated with me. Mind if we chat?",
+        "Hello! I'm working on a project related to {topic} and would value your input."
+    ],
+    "responses": [
+        "Hey! Thanks for reaching out. {timeframe} is going great, how about yours?",
+        "Hi! Yes, I'm really passionate about {interest}. What got you interested in it?",
+        "Thanks for the message! I'd be happy to discuss {topic} further.",
+        "Hello! Great to connect with someone from the {group} group!",
+        "Hi there! Always happy to connect with fellow {profession} folks.",
+        "Hey! Nice to meet you. Welcome to the community!",
+        "Thanks for your message! I'd love to hear more about your project.",
+        "Hi! Yes, let's definitely chat. What aspects interest you most?",
+        "Hello! Thanks for reaching out. How can I help?",
+        "Great to hear from you! I'm always up for a good conversation."
+    ],
+    "follow_ups": [
+        "That's really interesting! Have you tried {suggestion}?",
+        "I completely understand. In my experience, {advice}.",
+        "Thanks for sharing that. What's been your biggest challenge with {topic}?",
+        "That sounds like a great approach! How long have you been working on this?",
+        "I've had similar experiences. Would you be interested in {collaboration}?",
+        "Absolutely! I think {idea} could really work well for that.",
+        "That's a great point. Have you considered {alternative}?",
+        "I appreciate your perspective. What resources have you found most helpful?",
+        "Sounds like you're making great progress! What's next on your roadmap?",
+        "I'd love to learn more about your approach to {topic}."
+    ],
+    "closings": [
+        "Thanks for the great conversation! Let's stay in touch.",
+        "This has been really helpful. Looking forward to chatting again soon!",
+        "I really enjoyed our discussion. Feel free to reach out anytime!",
+        "Thanks for your time and insights. Talk to you later!",
+        "Great chatting with you! Let me know if you need anything.",
+        "This was wonderful. Let's continue this conversation soon!",
+        "Thanks for the valuable exchange. Have a great {timeframe}!",
+        "Really appreciate your thoughts. Let's connect again soon!",
+        "It's been great talking with you. Take care!",
+        "Thanks for the chat! Looking forward to our next conversation."
+    ],
+    "variables": {
+        "timeframe": ["day", "week", "weekend", "morning", "evening"],
+        "interest": ["web development", "design", "photography", "fitness", "cooking", "travel", "music", "writing"],
+        "topic": ["productivity", "remote work", "creativity", "learning", "community building", "technology", "wellness", "career growth"],
+        "group": ["developers", "designers", "entrepreneurs", "fitness", "photography", "book club", "local community"],
+        "profession": ["developer", "designer", "marketer", "educator", "entrepreneur", "consultant", "creative"],
+        "event": ["meetup", "workshop", "webinar", "conference", "networking event", "community gathering"],
+        "suggestion": ["using a different approach", "this new tool I discovered", "collaborating with others", "breaking it down into smaller steps"],
+        "advice": ["starting small helps", "consistency is key", "finding the right tools makes a difference", "connecting with others in the field is valuable"],
+        "collaboration": ["collaborating on a project", "sharing resources", "co-hosting an event", "starting a study group"],
+        "idea": ["a weekly check-in", "creating a shared resource", "organizing a meetup", "starting a discussion thread"],
+        "alternative": ["a different perspective", "another approach", "this method", "reaching out to experts"]
+    },
+    "thread_templates": [
+        {
+            "type": "professional_networking",
+            "messages": [
+                "Hi! I noticed we're both in the {profession} field. Would love to connect and share experiences.",
+                "Hello! Thanks for reaching out. Always happy to connect with fellow professionals. What's your focus area?",
+                "I primarily work with {topic}. Been in the field for a few years now. How about you?",
+                "That's great! I've been exploring {topic} lately. Any tips for someone getting started?",
+                "I'd suggest {suggestion}. It really helped me when I was starting out. Happy to share some resources!",
+                "That would be amazing, thank you! Really appreciate your willingness to help."
+            ]
+        },
+        {
+            "type": "project_collaboration",
+            "messages": [
+                "Hey! I saw your post about looking for collaborators on a {topic} project. I'm interested!",
+                "Hi there! Great to hear from you. Tell me more about your experience with {topic}.",
+                "I've been working with {topic} for about a year. Recently completed a similar project. What's your vision?",
+                "The goal is to {idea}. I think your experience would be really valuable.",
+                "This sounds like a great opportunity! When were you thinking of starting?",
+                "How about we set up a call next week to discuss details? Looking forward to working together!"
+            ]
+        },
+        {
+            "type": "community_welcome",
+            "messages": [
+                "Welcome to the community! Saw you just joined. If you need any help getting started, feel free to ask!",
+                "Thank you so much! This seems like a great community. Any groups you'd recommend?",
+                "Definitely check out the {group} group - very active and welcoming. What are your main interests?",
+                "I'm particularly interested in {interest} and {topic}. Still exploring what's available here.",
+                "Perfect! There's a {event} coming up next week that might interest you. Great way to meet people!",
+                "That sounds wonderful! Thanks for being so welcoming. Looking forward to getting involved!"
+            ]
+        }
+    ]
+}
