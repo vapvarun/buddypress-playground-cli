@@ -56,7 +56,13 @@ class BP_Playground_Autoloader {
         'BP_Playground_CLI_Users' => 'includes/cli/class-bp-playground-cli-users.php',
         'BP_Playground_CLI_Groups' => 'includes/cli/class-bp-playground-cli-groups.php',
         'BP_Playground_CLI_Activities' => 'includes/cli/class-bp-playground-cli-activities.php',
-        'BP_Playground_CLI_Scenario' => 'includes/cli/class-bp-playground-cli-scenario.php',
+        'BP_Playground_CLI_Scenario_Enhanced' => 'includes/cli/class-bp-playground-cli-scenario-enhanced.php',
+        'BP_Playground_CLI_Names' => 'includes/cli/class-bp-playground-cli-names.php',
+        
+        // Helper classes
+        'BP_Playground_Name_Handler' => 'includes/class-bp-playground-name-handler.php',
+        'BP_Playground_XProfile_Generator' => 'includes/class-bp-playground-xprofile-generator.php',
+        'BP_Playground_Sequence_Manager' => 'includes/class-bp-playground-sequence-manager.php',
     ];
 
     /**

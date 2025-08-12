@@ -200,6 +200,10 @@ class BP_Playground_XProfile_Module extends BP_Playground_Abstract_Module {
      * @return array|WP_Error Generation results
      */
     public function generate($args = []) {
+        // Check if we should use the new predefined structure
+        if (!empty($args['use_predefined']) || !empty($args['predefined'])) {
+            return $this->generate_with_predefined_structure($args);
+        }
         $defaults = [
             'field_groups' => 6,
             'fields_per_group' => 8,
@@ -307,25 +311,43 @@ class BP_Playground_XProfile_Module extends BP_Playground_Abstract_Module {
             $group_name = $group_names[$i];
             $group_config = $this->field_groups[$group_name];
 
-            // Create field group
-            $group_id = xprofile_insert_field_group([
-                'name' => $group_name,
-                'description' => $group_config['description'],
-                'can_delete' => true,
-            ]);
+            // Check if group already exists
+            global $wpdb;
+            $bp = buddypress();
+            $existing_group_id = null;
+            
+            if (isset($bp->profile->table_name_groups)) {
+                $existing_group_id = $wpdb->get_var($wpdb->prepare(
+                    "SELECT id FROM {$bp->profile->table_name_groups} WHERE name = %s",
+                    $group_name
+                ));
+            }
 
-            if ($group_id) {
-                $created_groups++;
-                
-                // Create fields for this group
-                $fields_result = $this->create_profile_fields($group_id, $group_config['fields']);
-                if (!is_wp_error($fields_result)) {
-                    $created_fields += $fields_result;
-                }
-
-                $this->log("Created XProfile field group: {$group_name} (ID: {$group_id})");
+            if ($existing_group_id) {
+                $group_id = $existing_group_id;
+                $this->log("XProfile field group '{$group_name}' already exists (ID: {$group_id}), using existing group");
             } else {
-                $this->log_error("Failed to create XProfile field group: {$group_name}");
+                // Create field group using BuddyPress native function (like bp-default-data plugin)
+                // This avoids the BP_XProfile_Group::populate() return type issue in BP 15.0.0-alpha
+                $group_id = xprofile_insert_field_group([
+                    'name' => $group_name,
+                    'description' => $group_config['description'],
+                    'can_delete' => true
+                ]);
+
+                if ($group_id) {
+                    $created_groups++;
+                    $this->log("Created XProfile field group: {$group_name} (ID: {$group_id})");
+                } else {
+                    $this->log_error("Failed to create XProfile field group: {$group_name}");
+                    continue;
+                }
+            }
+
+            // Create fields for this group
+            $fields_result = $this->create_profile_fields($group_id, $group_config['fields']);
+            if (!is_wp_error($fields_result)) {
+                $created_fields += $fields_result;
             }
         }
 
@@ -355,21 +377,55 @@ class BP_Playground_XProfile_Module extends BP_Playground_Abstract_Module {
 
         $created_fields = 0;
 
+        // Check if group exists first
+        if (!class_exists('BP_XProfile_Group')) {
+            $this->log_error("BP_XProfile_Group class not found - XProfile component may not be active");
+            return 0;
+        }
+
+        // Direct database check to avoid BP_XProfile_Group constructor issues in BP 15.0.0-alpha
+        global $wpdb;
+        $bp = buddypress();
+        $group_exists = $wpdb->get_var($wpdb->prepare(
+            "SELECT id FROM {$bp->profile->table_name_groups} WHERE id = %d",
+            $group_id
+        ));
+        
+        if (!$group_exists) {
+            $this->log_error("XProfile group {$group_id} does not exist");
+            return 0;
+        }
+
         foreach ($field_names as $field_name) {
+            // Check if field already exists in this group
+            global $wpdb;
+            $bp = buddypress();
+            $existing_field = $wpdb->get_var($wpdb->prepare(
+                "SELECT id FROM {$bp->profile->table_name_fields} WHERE group_id = %d AND name = %s",
+                $group_id,
+                $field_name
+            ));
+
+            if ($existing_field) {
+                $this->log("Field '{$field_name}' already exists in group {$group_id} (ID: {$existing_field}), skipping");
+                continue;
+            }
+
             $field_type = $this->get_field_type_for_name($field_name);
             $field_config = $this->field_types[$field_type];
 
-            $field_args = [
-                'field_group_id' => $group_id,  // This is correct for xprofile_insert_field
-                'name' => $field_name,
+            // Use BuddyPress native function (BP core bugs fixed)
+            $field_id = xprofile_insert_field([
+                'field_group_id' => $group_id,
+                'parent_id' => 0,
                 'type' => $field_type,
+                'name' => $field_name,
+                'description' => '',
                 'is_required' => $this->is_field_required($field_name),
                 'can_delete' => true,
                 'field_order' => $created_fields + 1,
-                'allow_custom_visibility' => $field_config['allow_custom_visibility'],
-            ];
-
-            $field_id = xprofile_insert_field($field_args);
+                'order_by' => 'custom'
+            ]);
 
             if ($field_id) {
                 $created_fields++;
@@ -407,37 +463,37 @@ class BP_Playground_XProfile_Module extends BP_Playground_Abstract_Module {
             return;
         }
 
-        // Get the parent field to get its group_id
-        $parent_field = new BP_XProfile_Field($field_id);
-        if (!$parent_field->id) {
+        // Get the parent field's group_id using direct SQL
+        global $wpdb;
+        $bp = buddypress();
+        $group_id = $wpdb->get_var($wpdb->prepare(
+            "SELECT group_id FROM {$bp->profile->table_name_fields} WHERE id = %d",
+            $field_id
+        ));
+        
+        if (!$group_id) {
             $this->log_error("Parent field {$field_id} not found for options");
             return;
         }
 
         $options = $field_config['options'][$field_name];
-        $option_order = 1;
 
         foreach ($options as $index => $option) {
-            $option_args = [
-                'field_group_id' => $parent_field->group_id, // Use parent field's group_id
+            // Use BuddyPress native function (BP core bugs fixed)
+            $option_id = xprofile_insert_field([
+                'field_group_id' => $group_id,
                 'parent_id' => $field_id,
-                'name' => $option,
                 'type' => 'option',
-                'option_order' => $option_order++, // Use option_order instead of field_order
+                'name' => $option,
                 'can_delete' => true,
-            ];
+                'is_default_option' => ($index === 0),
+                'option_order' => $index + 1
+            ]);
             
-            // Only set is_default_option if it's the first option
-            if ($index === 0) {
-                $option_args['is_default_option'] = true;
-            }
-            
-            $option_id = xprofile_insert_field($option_args);
-
-            if (!$option_id) {
-                $this->log_error("Failed to create option '{$option}' for field {$field_id}");
-            } else {
+            if ($option_id) {
                 $this->log("Created option '{$option}' for field {$field_id}");
+            } else {
+                $this->log_error("Failed to create option '{$option}' for field {$field_id}");
             }
         }
     }

@@ -90,6 +90,18 @@ final class BuddyPress_Playground {
         
         // Check dependencies
         add_action('admin_notices', [$this, 'check_dependencies']);
+        
+        // Initialize name handler for automatic name generation
+        add_action('bp_loaded', [$this, 'init_name_handler'], 20);
+    }
+    
+    /**
+     * Initialize the name handler
+     */
+    public function init_name_handler() {
+        if (class_exists('BP_Playground_Name_Handler')) {
+            new BP_Playground_Name_Handler();
+        }
     }
     
     /**
@@ -163,7 +175,8 @@ final class BuddyPress_Playground {
         WP_CLI::add_command('bp playground users', 'BP_Playground_CLI_Users');
         WP_CLI::add_command('bp playground groups', 'BP_Playground_CLI_Groups');
         WP_CLI::add_command('bp playground activities', 'BP_Playground_CLI_Activities');
-        WP_CLI::add_command('bp playground scenario', 'BP_Playground_CLI_Scenario');
+        WP_CLI::add_command('bp playground scenario', 'BP_Playground_CLI_Scenario_Enhanced');
+        WP_CLI::add_command('bp playground names', 'BP_Playground_CLI_Names');
     }
     
     /**

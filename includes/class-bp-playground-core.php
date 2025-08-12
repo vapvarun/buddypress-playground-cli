@@ -673,6 +673,34 @@ class BP_Playground_Core {
                     'topics_per_forum' => 25
                 ],
             ],
+            'custom' => [
+                // Custom scenario for generate_all command with user-defined parameters
+                'xprofile' => [
+                    'field_groups' => 3,
+                    'fields_per_group' => 5,
+                ],
+                'users' => [
+                    'count' => 100,
+                    'with_xprofile' => true,
+                ],
+                'groups' => [
+                    'count' => 10,
+                    'types' => 'mixed',
+                ],
+                'friends' => [
+                    'network_density' => 0.1,
+                ],
+                'activities' => [
+                    'count' => 1000,
+                ],
+                'messages' => [
+                    'count' => 500,
+                ],
+                'bbpress' => [
+                    'forums' => 5,
+                    'topics_per_forum' => 10,
+                ],
+            ],
         ];
     
         if (!isset($scenarios[$scenario_name])) {

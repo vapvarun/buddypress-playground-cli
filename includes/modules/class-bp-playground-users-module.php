@@ -328,6 +328,10 @@ class BP_Playground_Users_Module extends BP_Playground_Abstract_Module {
             $this->log_error('Failed to create user: ' . $user_id->get_error_message());
             return false;
         }
+        
+        // Let the name handler process names and nicename
+        // This will be triggered automatically via hooks but we can also call it directly
+        // to ensure proper name generation for new users
 
         // Set user activation status for BuddyPress
         if (function_exists('bp_core_activate_account')) {

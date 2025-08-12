@@ -470,14 +470,21 @@ class BP_Playground_Groups_Module extends BP_Playground_Abstract_Module {
         // Select random members
         $num_to_select = $member_count;
         
-        // Handle edge case where we only have 1 potential member
-        if ($num_to_select <= 0) {
+        // Handle edge cases
+        if ($num_to_select <= 0 || count($potential_members) == 0) {
             return;
         }
         
+        // Ensure we don't try to select more members than available
+        $num_to_select = min($num_to_select, count($potential_members));
+        
         if ($num_to_select == 1) {
             $selected_members = [$potential_members[0]];
+        } elseif ($num_to_select >= count($potential_members)) {
+            // If we need all or more members than available, use all
+            $selected_members = $potential_members;
         } else {
+            // Select random subset
             $selected_members = array_rand(array_flip($potential_members), $num_to_select);
             if (!is_array($selected_members)) {
                 $selected_members = [$selected_members];

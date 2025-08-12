@@ -790,7 +790,7 @@ class BP_Playground_Activities_Module extends BP_Playground_Abstract_Module {
      */
     private function generate_activity_action($activity_type, $user_id, $group_id = 0) {
         $user = get_userdata($user_id);
-        $user_link = bp_core_get_user_domain($user_id);
+        $user_link = function_exists('bp_members_get_user_url') ? bp_members_get_user_url($user_id) : bp_core_get_user_domain($user_id);
         $user_name = $user->display_name;
 
         switch ($activity_type) {
@@ -852,16 +852,18 @@ class BP_Playground_Activities_Module extends BP_Playground_Abstract_Module {
                 break;
 
             case 'friendship_created':
-                return bp_core_get_user_domain($user_id) . 'friends/';
+                $user_url = function_exists('bp_members_get_user_url') ? bp_members_get_user_url($user_id) : bp_core_get_user_domain($user_id);
+                return $user_url . 'friends/';
 
             case 'updated_profile':
-                return bp_core_get_user_domain($user_id) . 'profile/';
+                $user_url = function_exists('bp_members_get_user_url') ? bp_members_get_user_url($user_id) : bp_core_get_user_domain($user_id);
+                return $user_url . 'profile/';
 
             case 'new_blog_post':
                 return home_url('/blog/');
         }
 
-        return bp_core_get_user_domain($user_id);
+        return function_exists('bp_members_get_user_url') ? bp_members_get_user_url($user_id) : bp_core_get_user_domain($user_id);
     }
 
     /**
