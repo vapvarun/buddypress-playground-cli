@@ -44,7 +44,6 @@ class BP_Playground_Autoloader {
 
         // Module classes (heavy - only load when requested)
         'BP_Playground_Users_Module' => 'includes/modules/class-bp-playground-users-module.php',
-        'BP_Playground_XProfile_Module' => 'includes/modules/class-bp-playground-xprofile-module.php',
         'BP_Playground_Groups_Module' => 'includes/modules/class-bp-playground-groups-module.php',
         'BP_Playground_Activities_Module' => 'includes/modules/class-bp-playground-activities-module.php',
         'BP_Playground_Messages_Module' => 'includes/modules/class-bp-playground-messages-module.php',
@@ -57,11 +56,8 @@ class BP_Playground_Autoloader {
         'BP_Playground_CLI_Groups' => 'includes/cli/class-bp-playground-cli-groups.php',
         'BP_Playground_CLI_Activities' => 'includes/cli/class-bp-playground-cli-activities.php',
         'BP_Playground_CLI_Scenario_Enhanced' => 'includes/cli/class-bp-playground-cli-scenario-enhanced.php',
-        'BP_Playground_CLI_Names' => 'includes/cli/class-bp-playground-cli-names.php',
         
         // Helper classes
-        'BP_Playground_Name_Handler' => 'includes/class-bp-playground-name-handler.php',
-        'BP_Playground_XProfile_Generator' => 'includes/class-bp-playground-xprofile-generator.php',
         'BP_Playground_Sequence_Manager' => 'includes/class-bp-playground-sequence-manager.php',
     ];
 
@@ -74,7 +70,6 @@ class BP_Playground_Autoloader {
     private static $dependencies = [
         'BP_Playground_Abstract_Module' => ['BP_Playground_Module_Interface'],
         'BP_Playground_Users_Module' => ['BP_Playground_Abstract_Module'],
-        'BP_Playground_XProfile_Module' => ['BP_Playground_Abstract_Module'],
         'BP_Playground_Groups_Module' => ['BP_Playground_Abstract_Module'],
         'BP_Playground_Activities_Module' => ['BP_Playground_Abstract_Module'],
         'BP_Playground_Messages_Module' => ['BP_Playground_Abstract_Module'],

@@ -91,12 +91,6 @@ final class BuddyPress_Playground {
             require_once $xprofile_functions;
         }
         
-        // Load scenarios manager
-        $scenarios_file = BP_PLAYGROUND_PLUGIN_DIR . 'includes/class-bp-playground-scenarios.php';
-        if (file_exists($scenarios_file)) {
-            require_once $scenarios_file;
-        }
-        
         // Load textdomain
         load_plugin_textdomain(BP_PLAYGROUND_TEXT_DOMAIN, false, dirname(plugin_basename(__FILE__)) . '/languages');
         

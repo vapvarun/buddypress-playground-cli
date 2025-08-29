@@ -806,7 +806,7 @@ class BP_Playground_Activities_Module extends BP_Playground_Abstract_Module {
             case 'joined_group':
                 if ($group_id && function_exists('groups_get_group')) {
                     $group = groups_get_group($group_id);
-                    $group_link = bp_get_group_permalink($group);
+                    $group_link = function_exists('bp_get_group_url') ? bp_get_group_url($group) : bp_get_group_permalink($group);
                     return sprintf('<a href="%s">%s</a> joined the group <a href="%s">%s</a>', 
                         $user_link, $user_name, $group_link, $group->name);
                 }
@@ -815,7 +815,7 @@ class BP_Playground_Activities_Module extends BP_Playground_Abstract_Module {
             case 'group_activity_update':
                 if ($group_id && function_exists('groups_get_group')) {
                     $group = groups_get_group($group_id);
-                    $group_link = bp_get_group_permalink($group);
+                    $group_link = function_exists('bp_get_group_url') ? bp_get_group_url($group) : bp_get_group_permalink($group);
                     return sprintf('<a href="%s">%s</a> posted an update in the group <a href="%s">%s</a>', 
                         $user_link, $user_name, $group_link, $group->name);
                 }
@@ -845,9 +845,9 @@ class BP_Playground_Activities_Module extends BP_Playground_Abstract_Module {
         switch ($activity_type) {
             case 'joined_group':
             case 'group_activity_update':
-                if ($group_id && function_exists('bp_get_group_permalink')) {
+                if ($group_id) {
                     $group = groups_get_group($group_id);
-                    return bp_get_group_permalink($group);
+                    return function_exists('bp_get_group_url') ? bp_get_group_url($group) : (function_exists('bp_get_group_permalink') ? bp_get_group_permalink($group) : '');
                 }
                 break;
 
