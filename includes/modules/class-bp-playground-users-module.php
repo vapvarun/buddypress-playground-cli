@@ -145,6 +145,10 @@ class BP_Playground_Users_Module extends BP_Playground_Abstract_Module {
         }
     
         $this->end_generation();
+        
+        // Add compatibility key for sequence manager
+        $results['created'] = $results['users_created'];
+        
         return $results;
     }
 

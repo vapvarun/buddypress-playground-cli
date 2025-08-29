@@ -88,7 +88,9 @@ function bp_playground_create_xprofile_structure() {
     
     $results = array(
         'groups_created' => 0,
-        'fields_created' => 0
+        'fields_created' => 0,
+        'groups' => 0,
+        'fields' => 0
     );
     
     // Define 3 groups with ONLY 1 field of each type for testing
@@ -194,6 +196,10 @@ function bp_playground_create_xprofile_structure() {
             }
         }
     }
+    
+    // Also set the short names for compatibility
+    $results['groups'] = $results['groups_created'];
+    $results['fields'] = $results['fields_created'];
     
     return $results;
 }
@@ -371,6 +377,8 @@ function bp_playground_populate_xprofile($user_ids = array(), $assign_member_typ
     
     return array(
         'fields_populated' => $count,
-        'member_types_assigned' => $member_types_assigned
+        'member_types_assigned' => $member_types_assigned,
+        'users_populated' => count($user_ids),
+        'success' => true
     );
 }

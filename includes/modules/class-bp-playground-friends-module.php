@@ -154,6 +154,11 @@ class BP_Playground_Friends_Module extends BP_Playground_Abstract_Module {
             return new WP_Error('friendship_generation_failed', implode(', ', $results['errors']));
         }
         
+        // Calculate acceptance rate
+        $results['acceptance_rate'] = $results['friendships_created'] > 0 
+            ? round((($results['friendships_created'] - $results['pending_requests']) / $results['friendships_created']) * 100, 1)
+            : 0;
+        
         return $results;
     }
 
