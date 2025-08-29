@@ -680,7 +680,7 @@ class BP_Playground_Friends_Module extends BP_Playground_Abstract_Module {
         } else {
             // For safety, if no date filter is specified, we'll skip cleanup
             // to avoid accidentally removing all friendships
-            $this->log_warning('No date filter specified for friendship cleanup. Skipping to prevent data loss.');
+            $this->log('No date filter specified for friendship cleanup. Skipping to prevent data loss.', 'warning');
             return $results;
         }
 

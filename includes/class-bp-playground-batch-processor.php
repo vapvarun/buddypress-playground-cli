@@ -25,7 +25,7 @@ class BP_Playground_Batch_Processor {
      * @since 1.0.0
      * @var int
      */
-    private $batch_size = 100;
+    private $batch_size = 10;
 
     /**
      * Memory limit for operations
@@ -33,7 +33,7 @@ class BP_Playground_Batch_Processor {
      * @since 1.0.0
      * @var string
      */
-    private $memory_limit = '1024M';
+    private $memory_limit = '2048M';
 
     /**
      * Time limit for operations
@@ -81,8 +81,8 @@ class BP_Playground_Batch_Processor {
         $settings = $core ? $core->get_settings() : [];
 
         $defaults = [
-            'batch_size' => isset($settings['batch_size']) ? $settings['batch_size'] : 100,
-            'memory_limit' => isset($settings['memory_limit']) ? $settings['memory_limit'] : '1024M',
+            'batch_size' => isset($settings['batch_size']) ? $settings['batch_size'] : 10,
+            'memory_limit' => isset($settings['memory_limit']) ? $settings['memory_limit'] : '256M',
             'time_limit' => isset($settings['time_limit']) ? $settings['time_limit'] : 0,
             'enable_progress' => isset($settings['enable_progress_tracking']) ? $settings['enable_progress_tracking'] : true,
         ];
@@ -414,18 +414,29 @@ class BP_Playground_Batch_Processor {
     private function set_system_limits() {
         // Set memory limit
         if ($this->memory_limit) {
-            ini_set('memory_limit', $this->memory_limit);
+            @ini_set('memory_limit', $this->memory_limit);
+            
+            // Also try to set via WordPress constants if not already set
+            if (!defined('WP_MEMORY_LIMIT')) {
+                define('WP_MEMORY_LIMIT', $this->memory_limit);
+            }
+            if (!defined('WP_MAX_MEMORY_LIMIT')) {
+                define('WP_MAX_MEMORY_LIMIT', $this->memory_limit);
+            }
         }
 
         // Set time limit
         if ($this->time_limit !== null) {
-            set_time_limit($this->time_limit);
+            @set_time_limit($this->time_limit);
         }
 
         // Disable WordPress object cache if processing large datasets
         if (function_exists('wp_suspend_cache_addition')) {
             wp_suspend_cache_addition(true);
         }
+        
+        // Clear caches before starting
+        wp_cache_flush();
     }
 
     /**

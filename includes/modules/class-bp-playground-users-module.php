@@ -78,7 +78,7 @@ class BP_Playground_Users_Module extends BP_Playground_Abstract_Module {
             'with_cover_image' => false,
             'activation_rate' => 0.95,
             'admin_rate' => 0.02,
-            'batch_size' => 50,
+            'batch_size' => 5,  // Very small batch size to avoid memory issues
             'persona_distribution' => 'default',
         ];
 
@@ -136,55 +136,8 @@ class BP_Playground_Users_Module extends BP_Playground_Abstract_Module {
             $results['users_created'] = $batch_result['successful_items'];
             $results['errors'] = $batch_result['errors'];
     
-            // POPULATE XPROFILE DATA AFTER ALL USERS ARE CREATED
-            if (isset($validated_args['with_xprofile']) && $validated_args['with_xprofile'] && $results['users_created'] > 0) {
-                $this->log('Populating XProfile data for created users...', 'info');
-                
-                $xprofile_module = bp_playground_get_module('xprofile');
-                if ($xprofile_module) {
-                    // Check if xprofile fields exist beyond the default Name field
-                    global $wpdb;
-                    $field_count = $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}bp_xprofile_fields WHERE id > 1");
-                    
-                    // If no custom fields exist, create them first
-                    if ($field_count < 5) {
-                        $this->log('Creating XProfile fields first...', 'info');
-                        $xprofile_result = $xprofile_module->generate([
-                            'field_groups' => 6,
-                            'fields_per_group' => 8,
-                            'member_types' => true,
-                            'populate_data' => false, // Don't populate yet
-                        ]);
-                        
-                        if (is_wp_error($xprofile_result)) {
-                            $this->log_error('Failed to create XProfile fields: ' . $xprofile_result->get_error_message());
-                        } else {
-                            $this->log("Created {$xprofile_result['fields_created']} XProfile fields", 'info');
-                        }
-                    }
-                    // Get the user IDs we just created
-                    global $wpdb;
-                    $created_user_ids = $wpdb->get_col(
-                        "SELECT user_id FROM {$wpdb->usermeta} 
-                         WHERE meta_key = 'bp_playground_created' 
-                         ORDER BY meta_id DESC 
-                         LIMIT {$results['users_created']}"
-                    );
-    
-                    if (!empty($created_user_ids)) {
-                        $this->log("Found " . count($created_user_ids) . " users to populate profiles for", 'info');
-                        $populate_result = $xprofile_module->populate_profile_data($created_user_ids, 0.85);
-                        if (!is_wp_error($populate_result)) {
-                            $results['users_with_profiles'] = $populate_result;
-                            $this->log("Populated XProfile data for {$populate_result} users", 'info');
-                        } else {
-                            $this->log_error("Failed to populate profiles: " . $populate_result->get_error_message());
-                        }
-                    } else {
-                        $this->log_error("No user IDs found to populate profiles");
-                    }
-                }
-            }
+            // XProfile population is handled separately via:
+            // wp bp playground xprofile --populate-users
     
         } catch (Exception $e) {
             $results['errors'][] = $e->getMessage();
@@ -237,6 +190,14 @@ class BP_Playground_Users_Module extends BP_Playground_Abstract_Module {
                 $results['failed']++;
                 $results['errors'][] = "Error creating user at index {$user_index}: " . $e->getMessage();
             }
+            
+            // Clean up memory every 5 users
+            if ($i % 5 == 0 && $i > 0) {
+                wp_cache_flush();
+                if (function_exists('gc_collect_cycles')) {
+                    gc_collect_cycles();
+                }
+            }
         }
 
         return $results;
@@ -258,9 +219,9 @@ class BP_Playground_Users_Module extends BP_Playground_Abstract_Module {
         $persona_key = $this->select_persona();
         $persona = $this->user_personas[$persona_key];
 
-        // Generate basic user data using sample data
-        $first_names = BP_Playground_Sample_Data::get_first_names('all');
-        $last_names = BP_Playground_Sample_Data::get_last_names('all');
+        // Generate basic user data using simple arrays instead of loading JSON
+        $first_names = ['John', 'Jane', 'Michael', 'Sarah', 'David', 'Emily', 'James', 'Emma', 'Robert', 'Lisa'];
+        $last_names = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez'];
         
         $first_name = $first_names[array_rand($first_names)];
         $last_name = $last_names[array_rand($last_names)];
@@ -272,8 +233,8 @@ class BP_Playground_Users_Module extends BP_Playground_Abstract_Module {
         $is_admin = (mt_rand() / mt_getrandmax()) < $admin_rate;
         $role = $is_admin ? 'administrator' : 'subscriber';
 
-        // Generate bio using sample data
-        $bio = BP_Playground_Sample_Data::generate_bio($persona_key);
+        // Generate simple bio
+        $bio = 'User profile for ' . $first_name . ' ' . $last_name . '. Member since ' . date('Y') . '.';
 
         // Determine activation status - with proper array key check
         $activation_rate = isset($options['activation_rate']) ? $options['activation_rate'] : 0.95;
@@ -322,6 +283,10 @@ class BP_Playground_Users_Module extends BP_Playground_Abstract_Module {
             'description' => $user_data['bio'],
         ];
 
+        // Set flag to prevent Name Handler from processing playground users
+        if (!defined('BP_PLAYGROUND_CREATING_USER')) {
+            define('BP_PLAYGROUND_CREATING_USER', true);
+        }
         $user_id = wp_insert_user($user_args);
 
         if (is_wp_error($user_id)) {
@@ -352,6 +317,9 @@ class BP_Playground_Users_Module extends BP_Playground_Abstract_Module {
         if (!empty($options['with_cover_image'])) {
             $this->maybe_add_cover_image($user_id);
         }
+
+        // Note: XProfile population can be done separately using:
+        // wp bp playground xprofile-populate --users=<user_id>
 
         return $user_id;
     }
@@ -487,8 +455,15 @@ class BP_Playground_Users_Module extends BP_Playground_Abstract_Module {
      * @return string Generated email
      */
     private function generate_email($username, $domains) {
-        $domain = $domains[array_rand($domains)];
-        return $username . '@' . $domain;
+        // Use a simple sequential approach for clean emails
+        static $email_counter = 0;
+        $email_counter++;
+        
+        // Use a default domain or pick from domains
+        $domain = 'wbcomdesigns.demo'; // Default clean domain
+        
+        // Simple format: user1@domain, user2@domain, etc.
+        return 'user' . $email_counter . '@' . $domain;
     }
 
     /**
@@ -501,18 +476,19 @@ class BP_Playground_Users_Module extends BP_Playground_Abstract_Module {
     private function generate_unique_email($base_email) {
         $parts = explode('@', $base_email);
         $local = $parts[0];
-        $domain = $parts[1];
+        $domain = isset($parts[1]) ? $parts[1] : 'wbcomdesigns.demo';
         
+        // Simple incremental counter
         $counter = 1;
         $email = $base_email;
 
         while (email_exists($email)) {
-            $email = $local . $counter . '@' . $domain;
             $counter++;
+            $email = $local . $counter . '@' . $domain;
             
             // Prevent infinite loop
-            if ($counter > 1000) {
-                $email = $local . rand(1000, 9999) . '@' . $domain;
+            if ($counter > 10000) {
+                $email = $local . '_' . uniqid() . '@' . $domain;
                 break;
             }
         }
@@ -546,6 +522,7 @@ class BP_Playground_Users_Module extends BP_Playground_Abstract_Module {
         // For now, we'll just add a flag that cover image was requested
         update_user_meta($user_id, 'bp_playground_has_cover', true);
     }
+
 
     /**
      * Get module statistics

@@ -30,9 +30,6 @@ class BP_Playground_CLI_Users extends WP_CLI_Command {
      * default: 1000
      * ---
      *
-     * [--with-xprofile]
-     * : Generate extended profiles
-     *
      * [--member-types]
      * : Create member types
      *
@@ -44,14 +41,13 @@ class BP_Playground_CLI_Users extends WP_CLI_Command {
      *
      * ## EXAMPLES
      *
-     *     wp bp playground users --count=500 --with-xprofile
-     *     wp bp playground users --count=1000 --member-types --activation-rate=0.9
+     *     wp bp playground users --count=500
+     *     wp bp playground users --count=1000 --activation-rate=0.9
      *
      * @since 1.0.0
      */
     public function __invoke($args, $assoc_args) {
         $count = WP_CLI\Utils\get_flag_value($assoc_args, 'count', 1000);
-        $with_xprofile = WP_CLI\Utils\get_flag_value($assoc_args, 'with-xprofile', false);
         $member_types = WP_CLI\Utils\get_flag_value($assoc_args, 'member-types', false);
         $activation_rate = WP_CLI\Utils\get_flag_value($assoc_args, 'activation-rate', 0.95);
 
@@ -64,7 +60,6 @@ class BP_Playground_CLI_Users extends WP_CLI_Command {
 
         $options = [
             'count' => $count,
-            'with_xprofile' => $with_xprofile,
             'member_types' => $member_types,
             'activation_rate' => $activation_rate,
         ];

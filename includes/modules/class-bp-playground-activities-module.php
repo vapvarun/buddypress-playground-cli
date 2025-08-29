@@ -951,7 +951,7 @@ class BP_Playground_Activities_Module extends BP_Playground_Abstract_Module {
         global $wpdb;
 
         $group_ids = $wpdb->get_col(
-            "SELECT group_id FROM {$wpdb->base_prefix}bp_groupmeta WHERE meta_key = 'bp_playground_created'"
+            "SELECT group_id FROM {$wpdb->base_prefix}bp_groups_groupmeta WHERE meta_key = 'bp_playground_created'"
         );
 
         return array_map('intval', $group_ids);

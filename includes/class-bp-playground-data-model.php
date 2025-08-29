@@ -226,17 +226,55 @@ class BP_Playground_Data_Model {
         foreach ($social_levels as $level => $users) {
             $range = $friend_ranges[$level];
             foreach ($users as $user_id) {
-                $friend_count = rand($range['min'], min($range['max'], $user_count - 1));
+                // Calculate friend count - limited by available users (excluding self)
+                $max_possible_friends = $user_count - 1; // Can't be friends with self
+                $desired_min = $range['min'];
+                $desired_max = $range['max'];
+                
+                // Adjust the range based on available users
+                $actual_min = min($desired_min, $max_possible_friends);
+                $actual_max = min($desired_max, $max_possible_friends);
+                
+                // Make sure min doesn't exceed max
+                if ($actual_min > $actual_max) {
+                    $actual_min = $actual_max;
+                }
+                
+                $friend_count = $actual_min == $actual_max ? $actual_min : rand($actual_min, $actual_max);
                 
                 // Select random friends (excluding self)
                 $potential_friends = array_diff($user_ids, [$user_id]);
-                $selected_friends = array_rand(array_flip($potential_friends), min($friend_count, count($potential_friends)));
+                $potential_count = count($potential_friends);
+                $num_to_select = min($friend_count, $potential_count);
                 
-                if (!is_array($selected_friends)) {
-                    $selected_friends = [$selected_friends];
+                // Extra safety check
+                if ($num_to_select > $potential_count) {
+                    $num_to_select = $potential_count;
                 }
-
-                $friend_patterns[$user_id] = $selected_friends;
+                
+                if ($num_to_select > 0 && $potential_count > 0) {
+                    // Convert to indexed array to avoid issues with array_rand
+                    $potential_friends = array_values($potential_friends);
+                    
+                    if ($num_to_select == 1) {
+                        $selected_idx = array_rand($potential_friends);
+                        $selected_friends = [$potential_friends[$selected_idx]];
+                    } elseif ($num_to_select >= $potential_count) {
+                        // If we want all or more friends than available, just use all
+                        $selected_friends = $potential_friends;
+                    } else {
+                        $selected_indices = array_rand($potential_friends, $num_to_select);
+                        if (!is_array($selected_indices)) {
+                            $selected_indices = [$selected_indices];
+                        }
+                        $selected_friends = array_map(function($idx) use ($potential_friends) {
+                            return $potential_friends[$idx];
+                        }, $selected_indices);
+                    }
+                    $friend_patterns[$user_id] = $selected_friends;
+                } else {
+                    $friend_patterns[$user_id] = [];
+                }
             }
         }
 
@@ -314,10 +352,27 @@ class BP_Playground_Data_Model {
                 $engagement_count = round(count($user_ids) * $engagement_rate);
                 
                 // Select random users for engagement
-                if ($engagement_count > 0) {
-                    $engaging_users = array_rand(array_flip($user_ids), min($engagement_count, count($user_ids)));
-                    if (!is_array($engaging_users)) {
-                        $engaging_users = [$engaging_users];
+                $user_count = count($user_ids);
+                $actual_engagement_count = min($engagement_count, $user_count);
+                
+                if ($actual_engagement_count > 0 && $user_count > 0) {
+                    // Convert to indexed array
+                    $user_array = array_values($user_ids);
+                    
+                    if ($actual_engagement_count == 1) {
+                        $selected_idx = array_rand($user_array);
+                        $engaging_users = [$user_array[$selected_idx]];
+                    } elseif ($actual_engagement_count >= $user_count) {
+                        // If we want all or more users than available, use all
+                        $engaging_users = $user_array;
+                    } else {
+                        $selected_indices = array_rand($user_array, $actual_engagement_count);
+                        if (!is_array($selected_indices)) {
+                            $selected_indices = [$selected_indices];
+                        }
+                        $engaging_users = array_map(function($idx) use ($user_array) {
+                            return $user_array[$idx];
+                        }, $selected_indices);
                     }
                     $engagement_patterns[$content_id] = $engaging_users;
                 } else {

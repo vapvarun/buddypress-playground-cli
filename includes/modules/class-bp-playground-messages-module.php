@@ -364,10 +364,12 @@ class BP_Playground_Messages_Module extends BP_Playground_Abstract_Module {
         $subject = $this->generate_message_subject($conversation_type, $sender_id);
 
         // Determine conversation length
-        $message_count = $this->get_conversation_length($conversation_type, $options['conversation_depth']);
+        $conversation_depth = isset($options['conversation_depth']) ? $options['conversation_depth'] : 'mixed';
+        $message_count = $this->get_conversation_length($conversation_type, $conversation_depth);
 
         // Generate timestamps
-        $start_time = time() - mt_rand(0, $options['timeframe_days'] * 24 * 3600);
+        $timeframe_days = isset($options['timeframe_days']) ? $options['timeframe_days'] : 30;
+        $start_time = time() - mt_rand(0, $timeframe_days * 24 * 3600);
         $timestamps = $this->generate_conversation_timestamps($start_time, $message_count);
 
         // Reset random seed
@@ -404,7 +406,7 @@ class BP_Playground_Messages_Module extends BP_Playground_Abstract_Module {
             'recipients' => $thread_data['recipients'],
             'subject' => $thread_data['subject'],
             'content' => $initial_content,
-            'date_sent' => date('Y-m-d H:i:s', strtotime($thread_data['timestamps'][0])),
+            'date_sent' => date('Y-m-d H:i:s', $thread_data['timestamps'][0]),
         ]);
 
         if (!$thread_id) {
@@ -432,7 +434,7 @@ class BP_Playground_Messages_Module extends BP_Playground_Abstract_Module {
                 'sender_id' => $current_sender,
                 'thread_id' => $thread_id,
                 'content' => $message_content,
-                'date_sent' => date('Y-m-d H:i:s', strtotime($thread_data['timestamps'][$i])),
+                'date_sent' => date('Y-m-d H:i:s', $thread_data['timestamps'][$i]),
             ]);
 
             if ($message_id) {
@@ -479,36 +481,41 @@ class BP_Playground_Messages_Module extends BP_Playground_Abstract_Module {
     private function set_realistic_read_status($thread_id, $participants, $options) {
         global $wpdb;
 
-        if ($options['read_status_distribution'] !== 'realistic') {
+        $read_status = isset($options['read_status_distribution']) ? $options['read_status_distribution'] : 'realistic';
+        if ($read_status !== 'realistic') {
             return;
         }
 
         // Set read status based on realistic patterns
+        // In BuddyPress, unread_count is used instead of is_read
         foreach ($participants as $user_id) {
             $read_probability = mt_rand(1, 100);
             
-            // 70% chance the message is read
+            // 70% chance the message is read (unread_count = 0)
+            // 30% chance the message is unread (unread_count > 0)
             if ($read_probability <= 70) {
-                $is_read = 1;
-                // Read sometime after the last message
-                $read_date = date('Y-m-d H:i:s', time() - mt_rand(0, 7 * 24 * 3600));
+                $unread_count = 0; // Message is read
             } else {
-                $is_read = 0;
-                $read_date = '0000-00-00 00:00:00';
+                // Get the number of messages in this thread to set unread count
+                $message_count = $wpdb->get_var($wpdb->prepare(
+                    "SELECT COUNT(*) FROM {$wpdb->base_prefix}bp_messages_messages WHERE thread_id = %d",
+                    $thread_id
+                ));
+                // Set some messages as unread (random between 1 and total messages)
+                $unread_count = mt_rand(1, max(1, $message_count));
             }
 
-            // Update recipient read status
+            // Update recipient unread count
             $wpdb->update(
                 $wpdb->base_prefix . 'bp_messages_recipients',
                 [
-                    'is_read' => $is_read,
-                    'last_read' => $read_date,
+                    'unread_count' => $unread_count,
                 ],
                 [
                     'thread_id' => $thread_id,
                     'user_id' => $user_id,
                 ],
-                ['%d', '%s'],
+                ['%d'],
                 ['%d', '%d']
             );
         }

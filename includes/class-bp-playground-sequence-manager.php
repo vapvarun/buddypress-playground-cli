@@ -234,15 +234,23 @@ class BP_Playground_Sequence_Manager {
         
         // Use predefined structure if specified
         if (!empty($config['use_predefined_xprofile'])) {
-            $generator = new BP_Playground_XProfile_Generator();
-            $result = $generator->create_xprofile_structure();
+            // Load XProfile functions if not already loaded
+            $xprofile_functions = BP_PLAYGROUND_PLUGIN_DIR . 'includes/functions-bp-playground-xprofile.php';
+            if (file_exists($xprofile_functions)) {
+                require_once $xprofile_functions;
+            }
+            
+            // Register member types first
+            bp_playground_register_member_types();
+            
+            // Create XProfile structure
+            $result = bp_playground_create_xprofile_structure();
             
             $results = array_merge($results, $result);
             $this->log(sprintf(
-                "Created %d groups, %d fields, %d options",
-                $result['groups_created'],
-                $result['fields_created'],
-                $result['options_created']
+                "Created %d groups, %d fields",
+                $result['groups'],
+                $result['fields']
             ));
         } else if (!empty($config['xprofile_structure'])) {
             // Custom structure provided
@@ -316,7 +324,12 @@ class BP_Playground_Sequence_Manager {
         
         $this->log("Populating profiles for $total_users users");
         
-        $generator = new BP_Playground_XProfile_Generator();
+        // Load XProfile functions if not already loaded
+        $xprofile_functions = BP_PLAYGROUND_PLUGIN_DIR . 'includes/functions-bp-playground-xprofile.php';
+        if (file_exists($xprofile_functions)) {
+            require_once $xprofile_functions;
+        }
+        
         $populated = 0;
         
         // Determine completeness distribution
@@ -327,35 +340,13 @@ class BP_Playground_Sequence_Manager {
             'minimal' => 0.05
         ];
         
-        foreach ($users as $index => $user_id) {
-            // Skip admin unless specified
-            if ($user_id == 1 && empty($config['include_admin'])) {
-                continue;
-            }
+        // Populate all users at once with XProfile data and member types
+        $assign_member_types = !empty($config['member_types']);
+        $result = bp_playground_populate_xprofile($users, $assign_member_types);
+        
+        if ($result['success']) {
+            $populated = $result['users_populated'];
             
-            // Determine completeness level
-            $random = mt_rand(1, 100) / 100;
-            $cumulative = 0;
-            $completeness = 'complete';
-            
-            foreach ($completeness_levels as $level => $probability) {
-                $cumulative += $probability;
-                if ($random <= $cumulative) {
-                    $completeness = $level;
-                    break;
-                }
-            }
-            
-            // Generate profile data
-            $fields_populated = $generator->generate_user_profile_data($user_id, $completeness);
-            if ($fields_populated > 0) {
-                $populated++;
-            }
-            
-            // Progress update
-            if ($populated % 100 == 0) {
-                $this->log("Populated $populated profiles...");
-            }
         }
         
         $this->log("Profile data populated for $populated users");

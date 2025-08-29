@@ -85,24 +85,28 @@ final class BuddyPress_Playground {
         // Load autoloader only when WordPress is ready
         $this->load_autoloader();
         
+        // Load BuddyPress Playground XProfile functions
+        $xprofile_functions = BP_PLAYGROUND_PLUGIN_DIR . 'includes/functions-bp-playground-xprofile.php';
+        if (file_exists($xprofile_functions)) {
+            require_once $xprofile_functions;
+        }
+        
+        // Load scenarios manager
+        $scenarios_file = BP_PLAYGROUND_PLUGIN_DIR . 'includes/class-bp-playground-scenarios.php';
+        if (file_exists($scenarios_file)) {
+            require_once $scenarios_file;
+        }
+        
         // Load textdomain
         load_plugin_textdomain(BP_PLAYGROUND_TEXT_DOMAIN, false, dirname(plugin_basename(__FILE__)) . '/languages');
         
         // Check dependencies
         add_action('admin_notices', [$this, 'check_dependencies']);
         
-        // Initialize name handler for automatic name generation
-        add_action('bp_loaded', [$this, 'init_name_handler'], 20);
+        // Name handler disabled - names are handled by XProfile populate function
+        // add_action('bp_loaded', [$this, 'init_name_handler'], 20);
     }
     
-    /**
-     * Initialize the name handler
-     */
-    public function init_name_handler() {
-        if (class_exists('BP_Playground_Name_Handler')) {
-            new BP_Playground_Name_Handler();
-        }
-    }
     
     /**
      * Load autoloader safely
@@ -121,9 +125,19 @@ final class BuddyPress_Playground {
     }
     
     /**
-     * Get module (lazy loaded)
+     * Cached module instances
+     */
+    private $module_instances = [];
+    
+    /**
+     * Get module (lazy loaded and cached)
      */
     public function get_module($module_name) {
+        // Return cached instance if it exists
+        if (isset($this->module_instances[$module_name])) {
+            return $this->module_instances[$module_name];
+        }
+        
         // Ensure autoloader is loaded
         $this->load_autoloader();
         
@@ -151,9 +165,10 @@ final class BuddyPress_Playground {
 
         $class_name = $module_classes[$module_name];
         
-        // Create instance if class exists
+        // Create instance if class exists and cache it
         if (class_exists($class_name)) {
-            return new $class_name();
+            $this->module_instances[$module_name] = new $class_name();
+            return $this->module_instances[$module_name];
         }
 
         return null;
@@ -176,7 +191,8 @@ final class BuddyPress_Playground {
         WP_CLI::add_command('bp playground groups', 'BP_Playground_CLI_Groups');
         WP_CLI::add_command('bp playground activities', 'BP_Playground_CLI_Activities');
         WP_CLI::add_command('bp playground scenario', 'BP_Playground_CLI_Scenario_Enhanced');
-        WP_CLI::add_command('bp playground names', 'BP_Playground_CLI_Names');
+        // Names command removed - names are handled by XProfile populate function
+        // WP_CLI::add_command('bp playground names', 'BP_Playground_CLI_Names');
     }
     
     /**

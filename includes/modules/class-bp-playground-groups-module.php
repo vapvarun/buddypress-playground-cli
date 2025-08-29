@@ -771,13 +771,13 @@ class BP_Playground_Groups_Module extends BP_Playground_Abstract_Module {
 
         // Playground groups
         $stats['playground_groups'] = $wpdb->get_var(
-            "SELECT COUNT(*) FROM {$wpdb->base_prefix}bp_groupmeta WHERE meta_key = 'bp_playground_created'"
+            "SELECT COUNT(*) FROM {$wpdb->base_prefix}bp_groups_groupmeta WHERE meta_key = 'bp_playground_created'"
         );
 
         if ($stats['playground_groups'] > 0) {
             // Get playground group IDs
             $playground_group_ids = $wpdb->get_col(
-                "SELECT group_id FROM {$wpdb->base_prefix}bp_groupmeta WHERE meta_key = 'bp_playground_created'"
+                "SELECT group_id FROM {$wpdb->base_prefix}bp_groups_groupmeta WHERE meta_key = 'bp_playground_created'"
             );
 
             if (!empty($playground_group_ids)) {
@@ -797,13 +797,13 @@ class BP_Playground_Groups_Module extends BP_Playground_Abstract_Module {
 
                 // Groups with forums
                 $stats['groups_with_forums'] = $wpdb->get_var(
-                    "SELECT COUNT(*) FROM {$wpdb->base_prefix}bp_groupmeta 
+                    "SELECT COUNT(*) FROM {$wpdb->base_prefix}bp_groups_groupmeta 
                      WHERE meta_key = 'forum_id' AND group_id IN ({$group_ids_list})"
                 );
 
                 // Groups with hierarchies
                 $stats['groups_with_hierarchies'] = $wpdb->get_var(
-                    "SELECT COUNT(*) FROM {$wpdb->base_prefix}bp_groupmeta 
+                    "SELECT COUNT(*) FROM {$wpdb->base_prefix}bp_groups_groupmeta 
                      WHERE meta_key = 'bp_playground_parent_group' AND group_id IN ({$group_ids_list})"
                 );
 
@@ -857,7 +857,7 @@ class BP_Playground_Groups_Module extends BP_Playground_Abstract_Module {
         $group_query = "
             SELECT g.id, g.name 
             FROM {$wpdb->base_prefix}bp_groups g 
-            INNER JOIN {$wpdb->base_prefix}bp_groupmeta gm ON g.id = gm.group_id 
+            INNER JOIN {$wpdb->base_prefix}bp_groups_groupmeta gm ON g.id = gm.group_id 
             WHERE gm.meta_key = 'bp_playground_created'
         ";
 
@@ -894,7 +894,7 @@ class BP_Playground_Groups_Module extends BP_Playground_Abstract_Module {
 
             // Clean up any remaining meta
             $meta_cleaned = $wpdb->query(
-                "DELETE FROM {$wpdb->base_prefix}bp_groupmeta WHERE meta_key LIKE 'bp_playground_%'"
+                "DELETE FROM {$wpdb->base_prefix}bp_groups_groupmeta WHERE meta_key LIKE 'bp_playground_%'"
             );
             $results['meta_cleaned'] = $meta_cleaned;
         } else {

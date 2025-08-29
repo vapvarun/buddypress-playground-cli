@@ -204,6 +204,8 @@ class BP_Playground_BBPress_Module extends BP_Playground_Abstract_Module {
             'topics_created' => 0,
             'replies_created' => 0,
             'tags_created' => 0,
+            'subscriptions_created' => 0,
+            'favorites_created' => 0,
             'errors' => [],
         ];
 
@@ -230,6 +232,8 @@ class BP_Playground_BBPress_Module extends BP_Playground_Abstract_Module {
                     $results['topics_created'] = $content_result['topics_created'];
                     $results['replies_created'] = $content_result['replies_created'];
                     $results['tags_created'] = $content_result['tags_created'];
+                    $results['subscriptions_created'] = isset($content_result['subscriptions_created']) ? $content_result['subscriptions_created'] : 0;
+                    $results['favorites_created'] = isset($content_result['favorites_created']) ? $content_result['favorites_created'] : 0;
                     $results['errors'] = array_merge($results['errors'], $content_result['errors']);
                 }
             }
@@ -401,7 +405,7 @@ class BP_Playground_BBPress_Module extends BP_Playground_Abstract_Module {
                         }
 
                         // Add tags if enabled
-                        if ($args['with_tags']) {
+                        if (!empty($args['with_tags'])) {
                             $tags_added = $this->add_topic_tags($topic_id, $forum_meta);
                             $results['tags_created'] += $tags_added;
                         }
