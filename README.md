@@ -10,7 +10,7 @@ Generate comprehensive BuddyPress test data for development and testing.
 
 ```bash
 # Generate a complete test community with one command
-wp bp playground scenario generate small_community --clean
+wp bp playground scenario generate small_community --clean --yes
 
 # That's it! You now have:
 # ✓ 50 users with complete profiles and member types
@@ -87,6 +87,9 @@ wp bp playground scenario generate small_community
 # Clean existing data first (recommended)
 wp bp playground scenario generate development --clean
 
+# Skip confirmation prompts (for scripts/automation)
+wp bp playground scenario generate minimal --yes
+
 # Skip specific phases if needed
 wp bp playground scenario generate professional --skip-phases=forums,messages
 ```
@@ -96,16 +99,11 @@ wp bp playground scenario generate professional --skip-phases=forums,messages
 ### Users Module
 
 ```bash
-# Generate users with specific settings
-wp bp playground users generate 100 \
-  --role-distribution=natural \
-  --name-style=realistic \
-  --batch-size=10
+# Simple: Generate 100 users
+wp bp playground users --count=100
 
-# Options:
-# --role-distribution: equal, natural, custom
-# --name-style: realistic, simple, mixed
-# --set-avatars: true/false
+# With options
+wp bp playground users --count=50 --with-avatar --with-cover
 ```
 
 ### XProfile Module
@@ -146,21 +144,11 @@ wp eval "
 ### Groups Module
 
 ```bash
-# Create groups with members
-wp bp playground groups generate 20 \
-  --types=mixed \
-  --membership-patterns=true \
-  --batch-size=5
+# Simple: Generate 20 groups
+wp bp playground groups --count=20
 
-# Or via PHP
-wp eval "
-  $groups = bp_playground_get_module('groups');
-  $groups->generate([
-    'count' => 15,
-    'types' => 'mixed',
-    'membership_patterns' => true
-  ]);
-"
+# With member range
+wp bp playground groups --count=10 --min-members=5 --max-members=25
 ```
 
 ### Messages Module
@@ -181,24 +169,11 @@ wp eval "
 ### Activities Module
 
 ```bash
-# Generate activity stream with engagement
-wp bp playground activities generate 500 \
-  --with-comments=true \
-  --with-favorites=true \
-  --engagement-patterns=true
+# Simple: Generate 200 activities
+wp bp playground activities --count=200
 
-# Or via PHP
-wp eval "
-  $activities = bp_playground_get_module('activities');
-  $activities->generate([
-    'count' => 200,
-    'with_comments' => true,
-    'with_favorites' => true,
-    'engagement_patterns' => true,
-    'realistic_timing' => true,
-    'timeframe_days' => 30
-  ]);
-"
+# With engagement (comments, favorites)
+wp bp playground activities --count=100 --with-comments --with-favorites
 ```
 
 ### BBPress Module
@@ -214,6 +189,57 @@ wp eval "
     'with_tags' => true
   ]);
 "
+```
+
+## Utility Commands
+
+### System Info
+
+```bash
+# Display plugin and BuddyPress system info
+wp bp playground info
+
+# Output as JSON
+wp bp playground info --format=json
+```
+
+### Statistics
+
+```bash
+# View current data statistics
+wp bp playground stats
+
+# Detailed stats per component
+wp bp playground stats --detailed
+```
+
+### Data Verification
+
+```bash
+# Check data integrity
+wp bp playground verify
+
+# Check and auto-fix issues
+wp bp playground verify --fix
+
+# Check relationship integrity
+wp bp playground verify --relationships
+```
+
+### Cleanup
+
+```bash
+# Preview what would be cleaned (dry run)
+wp bp playground cleanup --dry-run
+
+# Clean all generated data
+wp bp playground cleanup --force
+
+# Clean specific component
+wp bp playground cleanup activities
+
+# Clean data older than 30 days
+wp bp playground cleanup --older-than=30
 ```
 
 ## Data Generation Sequence
