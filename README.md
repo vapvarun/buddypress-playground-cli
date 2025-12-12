@@ -26,7 +26,8 @@ wp bp playground scenario generate small_community --clean --yes
 
 - **7 Complete Modules**: Users, XProfile, Friends, Groups, Messages, Activities, BBPress
 - **Smart Data Generation**: Realistic names, profiles, and content
-- **Member Types**: Students, Professionals, Instructors, Alumni
+- **Member Types**: Students, Professionals, Teachers, Alumni, Moderators
+- **Group Types**: Community, Project, Course, Team, Support
 - **Proper Sequencing**: Data created in correct dependency order
 - **Predefined Scenarios**: From minimal (10 users) to large (5000 users)
 - **Batch Processing**: Efficient handling of large datasets
@@ -201,6 +202,50 @@ wp bp playground forums --forums=10 --topics=20 --replies=10
 
 # Without topic tags
 wp bp playground forums --forums=3 --no-tags
+```
+
+### Member Types
+
+```bash
+# List registered member types
+wp bp playground member-types list
+
+# Register default member types (student, teacher, professional, alumni, moderator)
+wp bp playground member-types register
+
+# Assign member types randomly to all users
+wp bp playground member-types assign --random --all
+
+# Assign specific type to specific users
+wp bp playground member-types assign --type=student --user-ids=5,6,7
+
+# Overwrite existing assignments
+wp bp playground member-types assign --random --all --overwrite
+
+# View member type statistics
+wp bp playground member-types stats
+```
+
+### Group Types
+
+```bash
+# List registered group types
+wp bp playground group-types list
+
+# Register default group types (community, project, course, team, support)
+wp bp playground group-types register
+
+# Assign group types randomly to all groups
+wp bp playground group-types assign --random --all
+
+# Assign specific type to specific groups
+wp bp playground group-types assign --type=course --group-ids=5,6,7
+
+# Overwrite existing assignments
+wp bp playground group-types assign --random --all --overwrite
+
+# View group type statistics
+wp bp playground group-types stats
 ```
 
 ## Utility Commands
