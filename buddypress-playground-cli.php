@@ -185,8 +185,9 @@ final class BuddyPress_Playground {
         WP_CLI::add_command('bp playground groups', 'BP_Playground_CLI_Groups');
         WP_CLI::add_command('bp playground activities', 'BP_Playground_CLI_Activities');
         WP_CLI::add_command('bp playground scenario', 'BP_Playground_CLI_Scenario_Enhanced');
-        // Names command removed - names are handled by XProfile populate function
-        // WP_CLI::add_command('bp playground names', 'BP_Playground_CLI_Names');
+        WP_CLI::add_command('bp playground messages', 'BP_Playground_CLI_Messages');
+        WP_CLI::add_command('bp playground friends', 'BP_Playground_CLI_Friends');
+        WP_CLI::add_command('bp playground forums', 'BP_Playground_CLI_Forums');
     }
     
     /**

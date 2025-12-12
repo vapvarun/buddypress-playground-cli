@@ -151,19 +151,33 @@ wp bp playground groups --count=20
 wp bp playground groups --count=10 --min-members=5 --max-members=25
 ```
 
+### Friends Module
+
+```bash
+# Generate friendships with default 10% network density
+wp bp playground friends
+
+# Higher density (more connections)
+wp bp playground friends --density=0.2
+
+# With specific pending rate
+wp bp playground friends --density=0.15 --pending-rate=0.1
+
+# No pending requests
+wp bp playground friends --no-pending
+```
+
 ### Messages Module
 
 ```bash
-# Generate private message threads
-wp eval "
-  $messages = bp_playground_get_module('messages');
-  $messages->generate([
-    'count' => 100,
-    'thread_variations' => true,
-    'conversation_depth' => 'mixed',
-    'timeframe_days' => 30
-  ]);
-"
+# Simple: Generate 50 message threads
+wp bp playground messages --count=50
+
+# With message range per thread
+wp bp playground messages --count=100 --min-messages=2 --max-messages=15
+
+# Within specific timeframe
+wp bp playground messages --count=200 --timeframe=30
 ```
 
 ### Activities Module
@@ -176,19 +190,17 @@ wp bp playground activities --count=200
 wp bp playground activities --count=100 --with-comments --with-favorites
 ```
 
-### BBPress Module
+### BBPress/Forums Module
 
 ```bash
-# Generate forums, topics, and replies
-wp eval "
-  $bbpress = bp_playground_get_module('bbpress');
-  $bbpress->generate([
-    'forums' => 5,
-    'topics_per_forum' => 10,
-    'replies_per_topic' => 5,
-    'with_tags' => true
-  ]);
-"
+# Simple: Generate 5 forums with topics and replies
+wp bp playground forums
+
+# Custom counts
+wp bp playground forums --forums=10 --topics=20 --replies=10
+
+# Without topic tags
+wp bp playground forums --forums=3 --no-tags
 ```
 
 ## Utility Commands

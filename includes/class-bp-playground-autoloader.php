@@ -56,6 +56,9 @@ class BP_Playground_Autoloader {
         'BP_Playground_CLI_Groups' => 'includes/cli/class-bp-playground-cli-groups.php',
         'BP_Playground_CLI_Activities' => 'includes/cli/class-bp-playground-cli-activities.php',
         'BP_Playground_CLI_Scenario_Enhanced' => 'includes/cli/class-bp-playground-cli-scenario-enhanced.php',
+        'BP_Playground_CLI_Messages' => 'includes/cli/class-bp-playground-cli-messages.php',
+        'BP_Playground_CLI_Friends' => 'includes/cli/class-bp-playground-cli-friends.php',
+        'BP_Playground_CLI_Forums' => 'includes/cli/class-bp-playground-cli-forums.php',
         
         // Helper classes
         'BP_Playground_Sequence_Manager' => 'includes/class-bp-playground-sequence-manager.php',
