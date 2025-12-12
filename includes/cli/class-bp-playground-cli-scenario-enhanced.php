@@ -35,6 +35,9 @@ class BP_Playground_CLI_Scenario_Enhanced extends WP_CLI_Command {
      * [--dry-run]
      * : Show what would be generated without actually creating data
      *
+     * [--yes]
+     * : Skip confirmation prompts
+     *
      * ## EXAMPLES
      *
      *     # Generate small community scenario
@@ -93,8 +96,9 @@ class BP_Playground_CLI_Scenario_Enhanced extends WP_CLI_Command {
             return;
         }
         
-        // Confirm before proceeding
-        if ($config['clean_existing']) {
+        // Confirm before proceeding (skip if --yes flag is provided)
+        $skip_confirm = isset($assoc_args['yes']);
+        if ($config['clean_existing'] && !$skip_confirm) {
             WP_CLI::confirm("This will DELETE all existing BuddyPress data. Continue?");
         }
         

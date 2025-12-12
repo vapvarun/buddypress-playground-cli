@@ -172,8 +172,8 @@ class BP_Playground_Sequence_Manager {
         
         $this->state[$phase]['status'] = $result['success'] ? 'completed' : 'failed';
         $this->state[$phase]['completed_at'] = time();
-        $this->state[$phase]['results'] = $result['data'];
-        $this->state[$phase]['errors'] = $result['errors'];
+        $this->state[$phase]['results'] = $result['data'] ?? null;
+        $this->state[$phase]['errors'] = $result['errors'] ?? [];
         
         return $result;
     }
@@ -431,11 +431,15 @@ class BP_Playground_Sequence_Manager {
             ];
         }
         
-        $this->log(sprintf("Created %d friendships", $result['created']));
-        
+        $this->log(sprintf("Created %d friendships", $result['friendships_created'] ?? 0));
+
         return [
             'success' => true,
-            'data' => $result
+            'data' => [
+                'created' => $result['friendships_created'] ?? 0,
+                'pending' => $result['pending_requests'] ?? 0,
+                'mutual' => $result['mutual_connections'] ?? 0
+            ]
         ];
     }
     
@@ -509,14 +513,18 @@ class BP_Playground_Sequence_Manager {
             ];
         }
         
-        $this->log(sprintf("Created %d activities", $result['created']));
-        
+        $this->log(sprintf("Created %d activities", $result['activities_created'] ?? 0));
+
         return [
             'success' => true,
-            'data' => $result
+            'data' => [
+                'created' => $result['activities_created'] ?? 0,
+                'comments' => $result['comments_created'] ?? 0,
+                'favorites' => $result['favorites_created'] ?? 0
+            ]
         ];
     }
-    
+
     /**
      * PHASE 9: Create forums (if bbPress is active)
      */

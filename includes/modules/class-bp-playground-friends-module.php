@@ -155,10 +155,13 @@ class BP_Playground_Friends_Module extends BP_Playground_Abstract_Module {
         }
         
         // Calculate acceptance rate
-        $results['acceptance_rate'] = $results['friendships_created'] > 0 
+        $results['acceptance_rate'] = $results['friendships_created'] > 0
             ? round((($results['friendships_created'] - $results['pending_requests']) / $results['friendships_created']) * 100, 1)
             : 0;
-        
+
+        // Add 'created' alias for consistency with other modules
+        $results['created'] = $results['friendships_created'];
+
         return $results;
     }
 

@@ -272,6 +272,9 @@ class BP_Playground_Activities_Module extends BP_Playground_Abstract_Module {
             $this->log_error('Activities generation failed: ' . $e->getMessage());
         }
 
+        // Add 'created' alias for consistency with other modules
+        $results['created'] = $results['activities_created'];
+
         $this->end_generation();
         return $results;
     }
