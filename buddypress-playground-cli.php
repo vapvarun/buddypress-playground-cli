@@ -190,6 +190,7 @@ final class BuddyPress_Playground {
         WP_CLI::add_command('bp playground forums', 'BP_Playground_CLI_Forums');
         WP_CLI::add_command('bp playground member-types', 'BP_Playground_CLI_Member_Types');
         WP_CLI::add_command('bp playground group-types', 'BP_Playground_CLI_Group_Types');
+        WP_CLI::add_command('bp playground media', 'BP_Playground_CLI_Media');
     }
     
     /**

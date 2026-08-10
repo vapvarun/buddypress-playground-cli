@@ -61,6 +61,7 @@ class BP_Playground_Autoloader {
         'BP_Playground_CLI_Forums' => 'includes/cli/class-bp-playground-cli-forums.php',
         'BP_Playground_CLI_Member_Types' => 'includes/cli/class-bp-playground-cli-member-types.php',
         'BP_Playground_CLI_Group_Types' => 'includes/cli/class-bp-playground-cli-group-types.php',
+        'BP_Playground_CLI_Media' => 'includes/cli/class-bp-playground-cli-media.php',
 
         // Helper classes
         'BP_Playground_Sequence_Manager' => 'includes/class-bp-playground-sequence-manager.php',
