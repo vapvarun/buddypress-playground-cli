@@ -62,6 +62,10 @@ class BP_Playground_CLI_Media extends WP_CLI_Command {
      * [--standalone=<number>]
      * : Photos belonging to no album and no activity. Default 1.
      *
+     * [--messages=<number>]
+     * : Private messages carrying a photo attachment. Default 1. BuddyBoss only -
+     * neither BuddyPress core nor rtMedia supports attachments in messages.
+     *
      * [--user=<id>]
      * : Owner for profile media. Defaults to the first administrator.
      *
@@ -89,6 +93,7 @@ class BP_Playground_CLI_Media extends WP_CLI_Command {
         $albums       = (int) WP_CLI\Utils\get_flag_value($assoc_args, 'albums', 1);
         $group_albums = (int) WP_CLI\Utils\get_flag_value($assoc_args, 'group-albums', 1);
         $standalone   = (int) WP_CLI\Utils\get_flag_value($assoc_args, 'standalone', 1);
+        $messages     = (int) WP_CLI\Utils\get_flag_value($assoc_args, 'messages', 1);
         $user         = (int) WP_CLI\Utils\get_flag_value($assoc_args, 'user', 0);
 
         if ($user <= 0) {
@@ -109,6 +114,7 @@ class BP_Playground_CLI_Media extends WP_CLI_Command {
             'photos'       => 0,
             'standalone'   => 0,
             'activities'   => 0,
+            'messages'     => 0,
         ];
 
         // Profile albums, each with photos - the first of each album carries an
@@ -159,22 +165,161 @@ class BP_Playground_CLI_Media extends WP_CLI_Command {
             }
         }
 
+        // Photos sent inside a private message. A different storage path from
+        // everything above - the row hangs off a MESSAGE, not an activity or an
+        // album - and the one most easily left out of a fixture, because nothing
+        // else breaks when it is missing.
+        $made['messages'] = $this->create_message_attachments($user, $messages);
+
         WP_CLI::success(
             sprintf(
-                '%d profile album(s), %d group album(s), %d photo(s), %d standalone, %d activity-attached',
+                '%d profile album(s), %d group album(s), %d photo(s), %d standalone, %d activity-attached, %d message attachment(s)',
                 $made['albums'],
                 $made['group_albums'],
                 $made['photos'],
                 $made['standalone'],
-                $made['activities']
+                $made['activities'],
+                $made['messages']
             )
         );
 
         // A generator that reports success while writing nothing is worse than
         // one that fails: the consumer tests an empty source and calls it a pass.
-        if (0 === $made['photos'] && 0 === $made['standalone']) {
+        //
+        // Counts EVERY kind it was asked for, message attachments included -
+        // an earlier version checked only photos and standalone, so
+        // `--messages=2` with the rest at zero wrote two rows and then errored
+        // saying nothing had been created.
+        $written = $made['photos'] + $made['standalone'] + $made['messages'];
+        $asked   = ($count * ($albums + count($this->group_ids($group_albums)))) + $standalone + $messages;
+
+        if (0 === $written && $asked > 0) {
             WP_CLI::error('no media rows were created - the source would prove nothing');
         }
+    }
+
+    /**
+     * Private messages carrying a photo.
+     *
+     * BuddyBoss only. BuddyPress core messages have no attachments, and rtMedia
+     * does not add them either - its contexts are profile, group and comment,
+     * never a message. So on rtMedia this reports nothing rather than pretending.
+     *
+     * The shape a real DM upload writes is TWO things, and only one of them is
+     * obvious:
+     *
+     *   bp_media.message_id      -> the row hangs off the message
+     *   bp_messages_meta         -> a `bp_media_ids` row on that message
+     *
+     * Readers resolve the attachment through the META. A fixture that sets only
+     * the column produces a message whose photo is invisible to anything reading
+     * it properly - which looks exactly like the bug it was meant to reproduce.
+     *
+     * @param int $sender Sender user id.
+     * @param int $count  How many messages to send.
+     * @return int Messages created with an attachment.
+     */
+    private function create_message_attachments($sender, $count) {
+        global $wpdb;
+
+        if ($count <= 0) {
+            return 0;
+        }
+
+        if ('buddyboss' !== $this->layer) {
+            WP_CLI::log('  message attachments skipped - only BuddyBoss stores media on a message');
+            return 0;
+        }
+
+        if (!function_exists('messages_new_message') || !function_exists('bp_messages_update_meta')) {
+            WP_CLI::warning('messages component unavailable - no message attachments created');
+            return 0;
+        }
+
+        $recipients = get_users([
+            'number'  => $count + 1,
+            'exclude' => [$sender],
+            'fields'  => 'ID',
+        ]);
+
+        if (empty($recipients)) {
+            WP_CLI::warning('no other member to message - no message attachments created');
+            return 0;
+        }
+
+        $made = 0;
+
+        for ($i = 0; $i < $count; $i++) {
+            $recipient = (int) $recipients[$i % count($recipients)];
+
+            // NOTE: this returns the THREAD id, not the message id. Treating it
+            // as a message id silently attaches the photo to whichever existing
+            // message happens to share that number - the fixture then shows an
+            // attachment on someone else's sentence, and every count still looks
+            // right. Cost an hour once; hence the comment.
+            $thread_id = messages_new_message([
+                'sender_id'  => $sender,
+                'recipients' => [$recipient],
+                'subject'    => 'Photo for you',
+                'content'    => 'Sent you a photo',
+                'error_type' => 'wp_error',
+            ]);
+
+            if (is_wp_error($thread_id) || !$thread_id) {
+                continue;
+            }
+
+            $message_id = (int) $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT MAX(id) FROM {$wpdb->prefix}bp_messages_messages WHERE thread_id = %d AND sender_id = %d",
+                    (int) $thread_id,
+                    $sender
+                )
+            );
+
+            if ($message_id <= 0) {
+                continue;
+            }
+
+            $file = $this->make_image();
+            if ('' === $file) {
+                continue;
+            }
+
+            $attachment = wp_insert_attachment(
+                [
+                    'post_mime_type' => 'image/png',
+                    'post_title'     => basename($file, '.png'),
+                    'post_status'    => 'inherit',
+                    'post_author'    => $sender,
+                ],
+                $file
+            );
+
+            if (is_wp_error($attachment) || !$attachment) {
+                continue;
+            }
+
+            require_once ABSPATH . 'wp-admin/includes/image.php';
+            wp_update_attachment_metadata($attachment, wp_generate_attachment_metadata($attachment, $file));
+
+            $media = bp_media_add([
+                'attachment_id' => $attachment,
+                'user_id'       => $sender,
+                'message_id'    => (int) $message_id,
+                'privacy'       => 'message',
+                'title'         => get_the_title($attachment),
+            ]);
+
+            if (is_wp_error($media) || !$media) {
+                continue;
+            }
+
+            bp_messages_update_meta((int) $message_id, 'bp_media_ids', (string) $media);
+            $made++;
+        }
+
+        return $made;
     }
 
     /**
