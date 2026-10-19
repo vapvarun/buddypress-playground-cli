@@ -39,8 +39,15 @@ class BP_Playground_CLI_Users extends WP_CLI_Command {
      * default: 0.95
      * ---
      *
+     * [--with-avatar]
+     * : Give each user a stock portrait matching their name (downloads from randomuser.me)
+     *
+     * [--with-cover]
+     * : Give each user a stock landscape cover image (downloads from picsum.photos)
+     *
      * ## EXAMPLES
      *
+     *     wp bp playground users --count=50 --with-avatar --with-cover
      *     wp bp playground users --count=500
      *     wp bp playground users --count=1000 --activation-rate=0.9
      *
@@ -62,6 +69,8 @@ class BP_Playground_CLI_Users extends WP_CLI_Command {
             'count' => $count,
             'member_types' => $member_types,
             'activation_rate' => $activation_rate,
+            'with_avatar' => (bool) WP_CLI\Utils\get_flag_value($assoc_args, 'with-avatar', false),
+            'with_cover_image' => (bool) WP_CLI\Utils\get_flag_value($assoc_args, 'with-cover', false),
         ];
 
         $result = $users_module->generate($options);

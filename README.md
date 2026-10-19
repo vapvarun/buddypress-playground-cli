@@ -64,6 +64,8 @@ wp plugin activate buddypress-playground-cli
 | `medium_community` | 500 | 50 | 2000 | Staging environment |
 | `large_community` | 5000 | 200 | 10000 | Performance testing |
 
+`minimal`, `small_community` and `development` give every member a stock portrait matched to their name and every member and group a stock cover image (downloaded from randomuser.me and picsum.photos, so they need internet access). The larger scenarios skip images.
+
 ## Scenario Usage
 
 ### List and Info Commands
@@ -103,7 +105,7 @@ wp bp playground scenario generate professional --skip-phases=forums,messages
 # Simple: Generate 100 users
 wp bp playground users --count=100
 
-# With options
+# With stock avatars (portrait matched to the name) and cover images
 wp bp playground users --count=50 --with-avatar --with-cover
 ```
 
@@ -150,6 +152,9 @@ wp bp playground groups --count=20
 
 # With member range
 wp bp playground groups --count=10 --min-members=5 --max-members=25
+
+# With stock group avatars and cover images
+wp bp playground groups --count=10 --with-avatar --with-cover
 ```
 
 ### Friends Module

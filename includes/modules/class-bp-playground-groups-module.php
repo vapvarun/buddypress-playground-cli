@@ -178,6 +178,8 @@ class BP_Playground_Groups_Module extends BP_Playground_Abstract_Module {
             'membership_patterns' => true,
             'enable_forums' => 'auto', // Add default value
             'member_distribution' => 'realistic',
+            'with_avatar' => false,
+            'with_cover_image' => false,
             'batch_size' => 25,
         ];
     
@@ -189,6 +191,8 @@ class BP_Playground_Groups_Module extends BP_Playground_Abstract_Module {
             'batch_size' => ['type' => 'int', 'min' => 1, 'max' => 100],
             'with_hierarchy' => ['type' => 'bool'],
             'membership_patterns' => ['type' => 'bool'],
+            'with_avatar' => ['type' => 'bool'],
+            'with_cover_image' => ['type' => 'bool'],
         ];
 
         $validated_args = $this->validate_args($args, $validation_rules);
@@ -398,6 +402,13 @@ class BP_Playground_Groups_Module extends BP_Playground_Abstract_Module {
 
         // Add group meta
         $this->add_group_meta($group_id, $group_data);
+
+        if (!empty($options['with_avatar'])) {
+            BP_Playground_Images::group_avatar($group_id);
+        }
+        if (!empty($options['with_cover_image'])) {
+            BP_Playground_Images::group_cover($group_id);
+        }
 
         // Add members if membership patterns are enabled
         if ($options['membership_patterns']) {

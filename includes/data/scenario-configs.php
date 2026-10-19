@@ -31,15 +31,17 @@ return [
         
         'users' => [
             'count' => 50,
-            'with_avatar' => false,
-            'with_cover_image' => false
+            'with_avatar' => true,
+            'with_cover_image' => true
         ],
         
         'groups' => [
             'count' => 10,
             'min_members' => 5,
             'max_members' => 20,
-            'with_forums' => false
+            'with_forums' => false,
+            'with_avatar' => true,
+            'with_cover_image' => true
         ],
         
         'friendships' => [
@@ -331,15 +333,17 @@ return [
         
         'users' => [
             'count' => 10,
-            'with_avatar' => false,
-            'with_cover_image' => false
+            'with_avatar' => true,
+            'with_cover_image' => true
         ],
         
         'groups' => [
             'count' => 3,
             'min_members' => 3,
             'max_members' => 5,
-            'with_forums' => false
+            'with_forums' => false,
+            'with_avatar' => true,
+            'with_cover_image' => true
         ],
         
         'friendships' => [
@@ -388,15 +392,17 @@ return [
         
         'users' => [
             'count' => 100,
-            'with_avatar' => false,
-            'with_cover_image' => false
+            'with_avatar' => true,
+            'with_cover_image' => true
         ],
         
         'groups' => [
             'count' => 15,
             'min_members' => 5,
             'max_members' => 30,
-            'with_forums' => false
+            'with_forums' => false,
+            'with_avatar' => true,
+            'with_cover_image' => true
         ],
         
         'friendships' => [
