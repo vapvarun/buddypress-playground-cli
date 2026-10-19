@@ -223,10 +223,11 @@ class BP_Playground_Users_Module extends BP_Playground_Abstract_Module {
         $persona_key = $this->select_persona();
         $persona = $this->user_personas[$persona_key];
 
-        // Generate basic user data using simple arrays instead of loading JSON
-        $first_names = ['John', 'Jane', 'Michael', 'Sarah', 'David', 'Emily', 'James', 'Emma', 'Robert', 'Lisa'];
-        $last_names = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez'];
-        
+        // Gender drives the first name and, with --with-avatar, the portrait.
+        $gender = BP_Playground_Utils::weighted_random(['male' => 45, 'female' => 45, 'neutral' => 10]);
+        $first_names = BP_Playground_Sample_Data::get_first_names($gender);
+        $last_names = BP_Playground_Sample_Data::get_last_names();
+
         $first_name = $first_names[array_rand($first_names)];
         $last_name = $last_names[array_rand($last_names)];
         $username = $this->generate_username($first_name, $last_name, $user_index);
@@ -256,6 +257,7 @@ class BP_Playground_Users_Module extends BP_Playground_Abstract_Module {
             'role' => $role,
             'bio' => $bio,
             'persona' => $persona_key,
+            'gender' => $gender,
             'is_activated' => $is_activated,
         ];
     }
@@ -314,7 +316,7 @@ class BP_Playground_Users_Module extends BP_Playground_Abstract_Module {
 
         // Handle avatar if requested - with proper array key check
         if (!empty($options['with_avatar'])) {
-            $this->maybe_add_avatar($user_id);
+            $this->maybe_add_avatar($user_id, $user_data['gender']);
         }
 
         // Handle cover image if requested - with proper array key check
@@ -505,13 +507,15 @@ class BP_Playground_Users_Module extends BP_Playground_Abstract_Module {
      * Maybe add avatar for user
      *
      * @since 1.0.0
-     * @param int $user_id User ID
+     * @param int    $user_id User ID
+     * @param string $gender  'male', 'female' or 'neutral'
      * @return void
      */
-    private function maybe_add_avatar($user_id) {
-        // This would integrate with avatar generation or placeholder services
-        // For now, we'll just add a flag that avatar was requested
-        update_user_meta($user_id, 'bp_playground_has_avatar', true);
+    private function maybe_add_avatar($user_id, $gender = 'neutral') {
+        update_user_meta($user_id, 'bp_playground_gender', $gender);
+        if (BP_Playground_Images::member_avatar($user_id, $gender)) {
+            update_user_meta($user_id, 'bp_playground_has_avatar', true);
+        }
     }
 
     /**
@@ -522,9 +526,9 @@ class BP_Playground_Users_Module extends BP_Playground_Abstract_Module {
      * @return void
      */
     private function maybe_add_cover_image($user_id) {
-        // This would integrate with cover image generation
-        // For now, we'll just add a flag that cover image was requested
-        update_user_meta($user_id, 'bp_playground_has_cover', true);
+        if (BP_Playground_Images::member_cover($user_id)) {
+            update_user_meta($user_id, 'bp_playground_has_cover', true);
+        }
     }
 
 

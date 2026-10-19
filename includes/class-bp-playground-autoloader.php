@@ -37,6 +37,7 @@ class BP_Playground_Autoloader {
         'BP_Playground_Validator' => 'includes/class-bp-playground-validator.php',
         'BP_Playground_Cleanup' => 'includes/class-bp-playground-cleanup.php',
         'BP_Playground_Sample_Data' => 'includes/class-bp-playground-sample-data.php',
+        'BP_Playground_Images' => 'includes/class-bp-playground-images.php',
 
         // Interfaces and abstracts
         'BP_Playground_Module_Interface' => 'includes/interfaces/interface-bp-playground-module.php',

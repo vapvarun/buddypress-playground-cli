@@ -42,8 +42,15 @@ class BP_Playground_CLI_Groups extends WP_CLI_Command {
      * [--membership-patterns]
      * : Use realistic membership patterns
      *
+     * [--with-avatar]
+     * : Give each group a stock square avatar (downloads from picsum.photos)
+     *
+     * [--with-cover]
+     * : Give each group a stock landscape cover image (downloads from picsum.photos)
+     *
      * ## EXAMPLES
      *
+     *     wp bp playground groups --count=10 --with-avatar --with-cover
      *     wp bp playground groups --count=50 --types=mixed
      *     wp bp playground groups --count=25 --with-hierarchy
      *
@@ -67,6 +74,8 @@ class BP_Playground_CLI_Groups extends WP_CLI_Command {
             'types' => $types,
             'with_hierarchy' => $with_hierarchy,
             'membership_patterns' => $membership_patterns,
+            'with_avatar' => (bool) WP_CLI\Utils\get_flag_value($assoc_args, 'with-avatar', false),
+            'with_cover_image' => (bool) WP_CLI\Utils\get_flag_value($assoc_args, 'with-cover', false),
         ];
 
         $result = $groups_module->generate($options);

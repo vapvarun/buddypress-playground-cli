@@ -383,7 +383,9 @@ class BP_Playground_Sequence_Manager {
             'count' => $group_count,
             'min_members' => $config['groups']['min_members'] ?? 5,
             'max_members' => $config['groups']['max_members'] ?? 50,
-            'with_forums' => $config['groups']['with_forums'] ?? false
+            'with_forums' => $config['groups']['with_forums'] ?? false,
+            'with_avatar' => $config['groups']['with_avatar'] ?? false,
+            'with_cover_image' => $config['groups']['with_cover_image'] ?? false
         ]);
         
         if (is_wp_error($result)) {
